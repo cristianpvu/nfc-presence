@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
+import CourseCalendar from '../components/CourseCalendar';
+import Icon from '../components/Icon';
 import Layout from '../components/Layout';
 import Pagination from '../components/Pagination';
 import { formatDate, formatInterval, hasEnded, isLive } from '../format';
@@ -36,15 +38,43 @@ export default function Courses() {
   const page = Number.isInteger(requested) && requested >= 1 && requested <= pageCount ? requested : defaultPage;
   const visible = courses?.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) ?? [];
 
+  const view = searchParams.get('view') === 'calendar' ? 'calendar' : 'list';
+
   const goTo = target => setSearchParams({ page: String(target) });
+  const showView = target => setSearchParams(target === 'calendar' ? { view: 'calendar' } : {});
 
   return (
     <Layout>
-      <h2 className="page-title">Cursurile mele</h2>
+      <div className="page-header">
+        <h2 className="page-title">Cursurile mele</h2>
+        <div className="view-toggle" role="group" aria-label="Mod de afișare">
+          <button
+            type="button"
+            className={view === 'list' ? 'btn btn-outline btn-icon active' : 'btn btn-outline btn-icon'}
+            onClick={() => showView('list')}
+            title="Listă"
+            aria-label="Listă"
+            aria-pressed={view === 'list'}
+          >
+            <Icon name="list" />
+          </button>
+          <button
+            type="button"
+            className={view === 'calendar' ? 'btn btn-outline btn-icon active' : 'btn btn-outline btn-icon'}
+            onClick={() => showView('calendar')}
+            title="Calendar"
+            aria-label="Calendar"
+            aria-pressed={view === 'calendar'}
+          >
+            <Icon name="courses" />
+          </button>
+        </div>
+      </div>
       {error && <div className="alert alert-danger">{error}</div>}
       {!courses && !error && <p className="muted">Se încarcă...</p>}
-      {courses?.length === 0 && <p className="muted">Nu aveți cursuri.</p>}
-      {courses?.length > 0 && (
+      {courses && view === 'calendar' && <CourseCalendar courses={courses} />}
+      {courses?.length === 0 && view === 'list' && <p className="muted">Nu aveți cursuri.</p>}
+      {courses?.length > 0 && view === 'list' && (
         <>
           <div className="card">
             <table className="table">
