@@ -4,13 +4,19 @@ import { io } from 'socket.io-client';
 import { API_URL, api } from '../api';
 import { getSession } from '../session';
 import Layout from '../components/Layout';
+import Icon from '../components/Icon';
+import Pagination from '../components/Pagination';
 import SeatMap from '../components/SeatMap';
 import { formatDate, formatInterval, formatTime } from '../format';
+import { exportAttendance } from '../exportCsv';
+
+const PAGE_SIZE = 15;
 
 export default function CourseView() {
   const { id } = useParams();
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     let active = true;
@@ -55,6 +61,9 @@ export default function CourseView() {
   }
 
   const { course, desks, attendances } = data;
+  const pageCount = Math.max(1, Math.ceil(attendances.length / PAGE_SIZE));
+  const currentPage = Math.min(page, pageCount);
+  const firstIndex = (currentPage - 1) * PAGE_SIZE;
 
   return (
     <Layout>
@@ -65,9 +74,19 @@ export default function CourseView() {
       </nav>
 
       <h2 className="page-title">{course.name}</h2>
-      <p className="course-meta">
-        {formatDate(course.startsAt)} · {formatInterval(course)} · {course.room.name}
-      </p>
+      <div className="course-meta">
+        <span>{formatDate(course.startsAt)} · {formatInterval(course)} · {course.room.name}</span>
+        <button
+          type="button"
+          className="btn btn-outline btn-icon"
+          onClick={() => exportAttendance(course, attendances, deskLabels)}
+          disabled={attendances.length === 0}
+          title="Exportă prezența (CSV)"
+          aria-label="Exportă prezența (CSV)"
+        >
+          <Icon name="export" />
+        </button>
+      </div>
 
       <section className="card">
         <div className="card-body">
@@ -93,9 +112,9 @@ export default function CourseView() {
               </tr>
             </thead>
             <tbody>
-              {attendances.map((item, index) => (
+              {attendances.slice(firstIndex, firstIndex + PAGE_SIZE).map((item, index) => (
                 <tr key={item._id}>
-                  <td>{index + 1}</td>
+                  <td>{firstIndex + index + 1}</td>
                   <td>{item.studentName}</td>
                   <td>{deskLabels.get(item.desk)}</td>
                   <td>{formatTime(item.createdAt)}</td>
@@ -105,6 +124,8 @@ export default function CourseView() {
           </table>
         )}
       </section>
+
+      <Pagination page={currentPage} pageCount={pageCount} onChange={setPage} />
     </Layout>
   );
 }

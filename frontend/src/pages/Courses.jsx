@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import Layout from '../components/Layout';
+import Pagination from '../components/Pagination';
 import { formatDate, formatInterval, hasEnded, isLive } from '../format';
 
 const PAGE_SIZE = 15;
@@ -68,22 +69,7 @@ export default function Courses() {
             </table>
           </div>
 
-          {pageCount > 1 && (
-            <nav className="pagination" aria-label="Paginare">
-              <button type="button" className="page-link" disabled={page === 1} onClick={() => goTo(page - 1)}>«</button>
-              {Array.from({ length: pageCount }, (_, index) => index + 1).map(number => (
-                <button
-                  key={number}
-                  type="button"
-                  className={number === page ? 'page-link active' : 'page-link'}
-                  onClick={() => goTo(number)}
-                >
-                  {number}
-                </button>
-              ))}
-              <button type="button" className="page-link" disabled={page === pageCount} onClick={() => goTo(page + 1)}>»</button>
-            </nav>
-          )}
+          <Pagination page={page} pageCount={pageCount} onChange={goTo} />
         </>
       )}
     </Layout>

@@ -1,9 +1,9 @@
 module.exports = {
   TAP_AGAIN: 'Atinge eticheta NFC de pe banca ta.',
-  UNKNOWN_DESK: 'Această etichetă nu este asociată niciunei bănci.',
+  UNKNOWN_DESK: 'Această etichetă NFC nu este asociată niciunei bănci.',
   NO_COURSE: 'Nu există niciun curs în desfășurare în această sală.',
   COURSE_ENDED: 'Cursul s-a încheiat.',
-  SEAT_TAKEN: 'Prezența a fost deja înregistrată de pe această bancă.',
+  SEAT_TAKEN: 'Prezența a fost deja înregistrată folosind această etichetă NFC.',
   DEVICE_USED: 'Ai înregistrat deja prezența la acest curs de pe acest dispozitiv.',
   INVALID_DEVICE: 'Dispozitivul nu a putut fi identificat.',
   INVALID_NAME: 'Introdu numele și prenumele.',

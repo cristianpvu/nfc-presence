@@ -14,7 +14,15 @@ const timeFormat = new Intl.DateTimeFormat('ro-RO', {
   minute: '2-digit',
 });
 
+const shortDateFormat = new Intl.DateTimeFormat('ro-RO', {
+  timeZone: TIME_ZONE,
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
+
 export const formatDate = value => dateFormat.format(new Date(value));
+export const formatShortDate = value => shortDateFormat.format(new Date(value));
 export const formatTime = value => timeFormat.format(new Date(value));
 export const formatInterval = course => `${formatTime(course.startsAt)} – ${formatTime(course.endsAt)}`;
 

@@ -16,11 +16,11 @@ router.post('/', async (req, res) => {
   const tagUid = await verifyTag({ picc, uid, ctr, cmac });
   if (!tagUid) return res.status(401).json({ error: TAP_AGAIN });
 
-  const desk = await Desk.findOne({ tagUid }).populate('room', 'name');
+  const desk = await Desk.findOne({ tagUid });
   if (!desk) return res.status(404).json({ error: UNKNOWN_DESK });
 
   const now = new Date();
-  const course = await Course.findOne({ room: desk.room._id, startsAt: { $lte: now }, endsAt: { $gte: now } })
+  const course = await Course.findOne({ room: desk.room, startsAt: { $lte: now }, endsAt: { $gte: now } })
     .sort({ startsAt: 1 });
   if (!course) return res.status(404).json({ error: NO_COURSE });
 
@@ -40,8 +40,6 @@ router.post('/', async (req, res) => {
   res.json({
     token,
     course: { name: course.name, startsAt: course.startsAt, endsAt: course.endsAt },
-    room: desk.room.name,
-    desk: desk.label,
   });
 });
 

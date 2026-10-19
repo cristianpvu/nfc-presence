@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from '../api';
 import { getDeviceId } from '../session';
 import { formatInterval } from '../format';
+import logo from '../assets/ase-logo.png';
 
 const TAP_AGAIN = 'Atinge eticheta NFC de pe banca ta.';
 
@@ -61,24 +62,16 @@ export default function Scan() {
   return (
     <main className="scan-page">
       <div className="card scan-card">
+        <img className="scan-logo" src={logo} alt="Academia de Studii Economice din București" />
         <h1 className="scan-title">Înregistrare prezență</h1>
 
-        {state.step === 'loading' && <p className="muted">Se verifică eticheta...</p>}
+        {(state.step === 'form' || state.step === 'done') && (
+          <p className="scan-course">{state.scan.course.name} {formatInterval(state.scan.course)}</p>
+        )}
+
+        {state.step === 'loading' && <p className="scan-course muted">Se verifică eticheta NFC...</p>}
 
         {state.step === 'error' && <div className="alert alert-danger">{state.message}</div>}
-
-        {(state.step === 'form' || state.step === 'done') && (
-          <dl className="details">
-            <dt>Curs</dt>
-            <dd>{state.scan.course.name}</dd>
-            <dt>Interval</dt>
-            <dd>{formatInterval(state.scan.course)}</dd>
-            <dt>Sala</dt>
-            <dd>{state.scan.room}</dd>
-            <dt>Banca</dt>
-            <dd>{state.scan.desk}</dd>
-          </dl>
-        )}
 
         {state.step === 'form' && (
           <form onSubmit={submit} noValidate>
