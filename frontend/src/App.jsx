@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { getSession, isAdmin } from './session';
 import Scan from './pages/Scan';
+import TestDevice from './pages/TestDevice';
 import Login from './pages/Login';
 import Courses from './pages/Courses';
 import CourseView from './pages/CourseView';
@@ -26,6 +27,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/scan" element={<Scan />} />
+      <Route path="/test-device" element={<TestDevice />} />
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
       <Route path="/courses/:id" element={<RequireAuth><CourseView /></RequireAuth>} />
