@@ -75,16 +75,17 @@ export default function CourseView() {
 
       <div className="title-row">
         <h2 className="page-title">{course.name}</h2>
-        <button
-          type="button"
-          className="btn btn-outline btn-icon"
-          onClick={() => exportAttendance(course, attendances, deskLabels)}
-          disabled={attendances.length === 0}
-          title="Exportă prezența (CSV)"
-          aria-label="Exportă prezența (CSV)"
-        >
-          <Icon name="export" />
-        </button>
+        {attendances.length > 0 && (
+          <button
+            type="button"
+            className="btn btn-outline btn-icon"
+            onClick={() => exportAttendance(course, attendances, deskLabels)}
+            title="Exportă prezența (CSV)"
+            aria-label="Exportă prezența (CSV)"
+          >
+            <Icon name="export" />
+          </button>
+        )}
       </div>
       <p className="course-meta">
         {formatDate(course.startsAt)} · {formatInterval(course)} · {course.room.name}
