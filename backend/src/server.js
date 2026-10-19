@@ -12,7 +12,6 @@ const scanRoutes = require('./routes/scan');
 const attendanceRoutes = require('./routes/attendance');
 const nfcRoutes = require('./routes/nfc');
 const adminRoutes = require('./routes/admin');
-const deviceTestRoutes = require('./routes/deviceTest');
 const registerSocket = require('./socket');
 const { NOT_FOUND, SERVER_ERROR } = require('./messages');
 
@@ -31,7 +30,6 @@ app.use('/api/scan', scanRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/nfc', nfcRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/device-test', deviceTestRoutes);
 
 app.use((req, res) => res.status(404).json({ error: NOT_FOUND }));
 
