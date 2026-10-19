@@ -147,8 +147,8 @@ export async function collectSignals() {
     stable,
     perBrowser,
     hashes: {
-      crossBrowser: await sha(stable),
-      hardwareOnly: await sha([stable.cores, stable.screen, stable.touchPoints, stable.webglImage, stable.webglParams, stable.audio]),
+      crossBrowser: await sha([stable.cores, stable.memory, stable.screen, stable.touchPoints, stable.timezone, stable.webglImage, stable.fonts]),
+      hardwareOnly: await sha([stable.cores, stable.screen, stable.touchPoints, stable.webglImage]),
       perBrowser: await sha({ ...stable, ...perBrowser }),
     },
   };
