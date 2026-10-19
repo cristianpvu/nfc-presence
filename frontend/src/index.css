@@ -652,6 +652,23 @@ h1, h2, h3 {
   height: 16px;
 }
 
+.btn-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.btn-with-icon .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-danger:hover:not(:disabled) {
+  color: var(--danger);
+  border-color: #f0c5c1;
+  background: var(--danger-bg);
+}
+
 .btn-block {
   width: 100%;
   margin-top: 1.25rem;
@@ -685,6 +702,70 @@ h1, h2, h3 {
   margin-top: 0.375rem;
   color: var(--danger);
   font-size: 0.875rem;
+}
+
+.table-actions {
+  width: 1%;
+  text-align: right;
+}
+
+.table-actions .btn-icon {
+  display: inline-flex;
+  margin-left: 0.375rem;
+}
+
+.inline-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inline-form .form-control {
+  width: 12rem;
+  padding: 0.25rem 0.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.inline-form .btn {
+  padding: 0.25rem 0.75rem;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+select.form-control {
+  height: calc(1.5em + 0.75rem + 2px);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.form-alert {
+  margin: 0 0 1rem;
+}
+
+.page-alert {
+  margin: 0 0 1rem;
 }
 
 .alert {

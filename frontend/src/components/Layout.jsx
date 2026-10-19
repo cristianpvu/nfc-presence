@@ -1,10 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { clearSession, getSession } from '../session';
+import { clearSession, getSession, isAdmin } from '../session';
 import Icon from './Icon';
 import logo from '../assets/ase-logo.png';
 
 const SIDEBAR_KEY = 'sidebar';
+
+const PROFESSOR_LINKS = [{ to: '/', label: 'Cursurile mele', icon: 'courses', end: true }];
+
+const ADMIN_LINKS = [
+  { to: '/admin/courses', label: 'Cursuri', icon: 'courses' },
+  { to: '/admin/rooms', label: 'Săli', icon: 'rooms' },
+  { to: '/admin/users', label: 'Utilizatori', icon: 'users' },
+];
 
 function initials(name = '') {
   const words = name.trim().split(/\s+/).filter(Boolean);
@@ -51,10 +59,12 @@ export default function Layout({ children }) {
           </Link>
 
           <nav className="sidebar-nav">
-            <NavLink to="/" end className="sidebar-link" title="Cursurile mele">
-              <Icon name="courses" />
-              <span>Cursurile mele</span>
-            </NavLink>
+            {(isAdmin() ? ADMIN_LINKS : PROFESSOR_LINKS).map(link => (
+              <NavLink key={link.to} to={link.to} end={link.end} className="sidebar-link" title={link.label}>
+                <Icon name={link.icon} />
+                <span>{link.label}</span>
+              </NavLink>
+            ))}
           </nav>
 
           <div className="sidebar-footer" ref={userRef}>

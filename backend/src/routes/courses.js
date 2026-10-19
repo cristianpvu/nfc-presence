@@ -18,7 +18,8 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const course = await Course.findOne({ _id: req.params.id, professor: req.user.id })
+  const filter = req.user.role === 'admin' ? { _id: req.params.id } : { _id: req.params.id, professor: req.user.id };
+  const course = await Course.findOne(filter)
     .select('name room startsAt endsAt')
     .populate('room', 'name');
   if (!course) return res.status(404).json({ error: NOT_FOUND });

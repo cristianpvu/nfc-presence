@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { SESSION_EXPIRED } = require('../messages');
+const { SESSION_EXPIRED, FORBIDDEN } = require('../messages');
 
 function requireAuth(req, res, next) {
   const token = req.headers.authorization?.replace(/^Bearer /, '');
@@ -12,6 +12,11 @@ function requireAuth(req, res, next) {
   }
 }
 
+function requireAdmin(req, res, next) {
+  if (req.user?.role === 'admin') return next();
+  res.status(403).json({ error: FORBIDDEN });
+}
+
 function requireApiKey(req, res, next) {
   const provided = Buffer.from(String(req.headers['x-api-key'] ?? ''));
   const expected = Buffer.from(process.env.NFC_API_KEY);
@@ -19,4 +24,4 @@ function requireApiKey(req, res, next) {
   res.status(401).json({ error: 'Invalid API key' });
 }
 
-module.exports = { requireAuth, requireApiKey };
+module.exports = { requireAuth, requireAdmin, requireApiKey };

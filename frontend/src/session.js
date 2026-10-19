@@ -13,6 +13,8 @@ export function saveSession(session) {
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 }
 
+export const isAdmin = () => getSession()?.user?.role === 'admin';
+
 export function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }

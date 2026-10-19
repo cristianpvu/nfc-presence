@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { API_URL, api } from '../api';
-import { getSession } from '../session';
+import { getSession, isAdmin } from '../session';
 import Layout from '../components/Layout';
 import Icon from '../components/Icon';
+import IconButton from '../components/IconButton';
 import Pagination from '../components/Pagination';
 import SeatMap from '../components/SeatMap';
 import { formatDate, formatInterval, formatTime } from '../format';
@@ -29,6 +30,9 @@ export default function CourseView() {
 
     const socket = io(API_URL || window.location.origin, { auth: { token: getSession()?.token } });
     socket.on('connect', () => socket.emit('join', id, () => load()));
+    socket.on('attendance-removed', ({ _id }) => {
+      setData(current => current && { ...current, attendances: current.attendances.filter(item => item._id !== _id) });
+    });
     socket.on('attendance', entry => {
       setData(current => {
         if (!current || current.attendances.some(item => item._id === entry._id)) return current;
@@ -61,6 +65,17 @@ export default function CourseView() {
   }
 
   const { course, desks, attendances } = data;
+  const admin = isAdmin();
+
+  async function removeAttendance(item) {
+    if (!window.confirm(`Ștergi prezența lui ${item.studentName}?`)) return;
+    try {
+      await api(`/api/admin/attendances/${item._id}`, { method: 'DELETE', auth: true });
+      setData(current => ({ ...current, attendances: current.attendances.filter(entry => entry._id !== item._id) }));
+    } catch (err) {
+      window.alert(err.message);
+    }
+  }
   const pageCount = Math.max(1, Math.ceil(attendances.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
   const firstIndex = (currentPage - 1) * PAGE_SIZE;
@@ -68,7 +83,7 @@ export default function CourseView() {
   return (
     <Layout>
       <nav className="breadcrumb">
-        <Link to="/">Cursurile mele</Link>
+        <Link to={admin ? '/admin/courses' : '/'}>{admin ? 'Cursuri' : 'Cursurile mele'}</Link>
         <span>/</span>
         <span>{course.name}</span>
       </nav>
@@ -112,6 +127,7 @@ export default function CourseView() {
                 <th>Nume complet</th>
                 <th>Banca</th>
                 <th>Ora</th>
+                {admin && <th />}
               </tr>
             </thead>
             <tbody>
@@ -121,6 +137,11 @@ export default function CourseView() {
                   <td>{item.studentName}</td>
                   <td>{deskLabels.get(item.desk)}</td>
                   <td>{formatTime(item.createdAt)}</td>
+                  {admin && (
+                    <td className="table-actions">
+                      <IconButton icon="trash" label="Șterge prezența" onClick={() => removeAttendance(item)} danger />
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

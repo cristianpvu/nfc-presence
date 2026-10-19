@@ -12,4 +12,5 @@ module.exports = {
   VERIFY_UNAVAILABLE: 'Serviciul de verificare NFC nu este disponibil. Încearcă din nou.',
   INVALID_LOGIN: 'Email sau parolă incorectă.',
   SESSION_EXPIRED: 'Sesiunea a expirat. Autentifică-te din nou.',
+  FORBIDDEN: 'Nu ai acces la această pagină.',
 };
