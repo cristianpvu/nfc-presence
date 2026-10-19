@@ -67,7 +67,7 @@ export default function AdminCourses() {
   }
 
   async function remove(course) {
-    if (!window.confirm(`Ștergi cursul „${course.name}” din ${formatDate(course.startsAt)}? Se vor șterge și prezențele lui.`)) return;
+    if (!window.confirm(`Ștergi cursul „${course.name}” din ${formatDate(course.startsAt)}? Se vor șterge și prezențele aferente.`)) return;
     setError('');
     try {
       await api(`/api/admin/courses/${course._id}`, { method: 'DELETE', auth: true });
