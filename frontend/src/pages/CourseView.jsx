@@ -4,7 +4,6 @@ import { io } from 'socket.io-client';
 import { API_URL, api } from '../api';
 import { getSession } from '../session';
 import Layout from '../components/Layout';
-import Modal from '../components/Modal';
 import Icon from '../components/Icon';
 import Pagination from '../components/Pagination';
 import SeatMap from '../components/SeatMap';
@@ -18,7 +17,6 @@ export default function CourseView() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
-  const [selectedDesk, setSelectedDesk] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -63,7 +61,6 @@ export default function CourseView() {
   }
 
   const { course, desks, attendances } = data;
-  const selected = selectedDesk && occupants.get(selectedDesk._id);
   const pageCount = Math.max(1, Math.ceil(attendances.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
   const firstIndex = (currentPage - 1) * PAGE_SIZE;
@@ -96,7 +93,7 @@ export default function CourseView() {
 
       <section className="card">
         <div className="card-body">
-          <SeatMap desks={desks} occupants={occupants} onSelect={setSelectedDesk} />
+          <SeatMap desks={desks} occupants={occupants} />
           <p className="occupancy muted">{attendances.length} din {desks.length} locuri ocupate</p>
         </div>
       </section>
@@ -132,17 +129,6 @@ export default function CourseView() {
       </section>
 
       <Pagination page={currentPage} pageCount={pageCount} onChange={setPage} />
-
-      {selected && (
-        <Modal title={`Banca ${selectedDesk.label}`} onClose={() => setSelectedDesk(null)}>
-          <dl className="details">
-            <dt>Nume complet</dt>
-            <dd>{selected.studentName}</dd>
-            <dt>Ora</dt>
-            <dd>{formatTime(selected.createdAt)}</dd>
-          </dl>
-        </Modal>
-      )}
     </Layout>
   );
 }
