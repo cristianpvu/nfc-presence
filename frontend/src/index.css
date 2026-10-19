@@ -320,33 +320,20 @@ h1, h2, h3 {
   font-size: 0.875rem;
 }
 
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.title-row .page-title {
+  margin-bottom: 0;
+}
+
 .course-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin: -0.5rem 0 1rem;
+  margin: -0.5rem 0 1.5rem;
   color: var(--muted);
-}
-
-.btn-outline {
-  color: var(--text);
-  background: #fff;
-  border-color: var(--border);
-}
-
-.btn-outline:hover:not(:disabled) {
-  background: #f1f3f5;
-}
-
-.btn-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 38px;
-  height: 38px;
-  padding: 0;
 }
 
 .card {
@@ -491,6 +478,31 @@ h1, h2, h3 {
   border-color: var(--primary-hover);
 }
 
+.btn-outline {
+  color: var(--text);
+  background: #fff;
+  border-color: var(--border);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: #f1f3f5;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+}
+
+.btn-icon .icon {
+  width: 18px;
+  height: 18px;
+}
+
 .btn-block {
   width: 100%;
   margin-top: 1.25rem;
@@ -549,14 +561,11 @@ h1, h2, h3 {
 .scan-page {
   min-height: 100vh;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   padding: 3rem 1rem;
 }
 
-.login-page {
-  align-items: center;
-}
 
 .login-card,
 .scan-card {
@@ -580,7 +589,7 @@ h1, h2, h3 {
 .scan-course {
   margin: 0.5rem 0 0;
   text-align: center;
-  font-weight: 700;
+  color: var(--muted);
 }
 
 .login-logo {

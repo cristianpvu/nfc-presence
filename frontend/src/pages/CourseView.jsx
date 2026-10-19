@@ -73,9 +73,8 @@ export default function CourseView() {
         <span>{course.name}</span>
       </nav>
 
-      <h2 className="page-title">{course.name}</h2>
-      <div className="course-meta">
-        <span>{formatDate(course.startsAt)} · {formatInterval(course)} · {course.room.name}</span>
+      <div className="title-row">
+        <h2 className="page-title">{course.name}</h2>
         <button
           type="button"
           className="btn btn-outline btn-icon"
@@ -87,6 +86,9 @@ export default function CourseView() {
           <Icon name="export" />
         </button>
       </div>
+      <p className="course-meta">
+        {formatDate(course.startsAt)} · {formatInterval(course)} · {course.room.name}
+      </p>
 
       <section className="card">
         <div className="card-body">
