@@ -1,38 +1,54 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { clearSession, getSession } from '../session';
 import logo from '../assets/ase-logo.png';
 
-const COLLAPSED_KEY = 'sidebarCollapsed';
+const SIDEBAR_KEY = 'sidebar';
 
-function readCollapsed() {
-  const saved = localStorage.getItem(COLLAPSED_KEY);
-  return saved === null ? window.innerWidth < 768 : saved === 'true';
-}
+const ICONS = {
+  menu: 'M4 6h16M4 12h16M4 18h16',
+  courses: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+  logout: 'M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 8l-4 4 4 4M6 12h10',
+  left: 'M15 6l-6 6 6 6',
+  right: 'M9 6l6 6-6 6',
+  down: 'M6 9l6 6 6-6',
+};
 
-function Icon({ path }) {
+function Icon({ name }) {
   return (
     <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
-      <path d={path} />
+      <path d={ICONS[name]} />
     </svg>
   );
 }
 
-const ICONS = {
-  courses: 'M4 5h16M4 12h16M4 19h16',
-  logout: 'M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 8l-4 4 4 4M6 12h10',
-  collapse: 'M15 6l-6 6 6 6',
-  expand: 'M9 6l6 6-6 6',
-};
+function initials(name = '') {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '?';
+  const first = words[0][0];
+  const last = words.length > 1 ? words[words.length - 1][0] : '';
+  return (first + last).toUpperCase();
+}
 
 export default function Layout({ children }) {
   const navigate = useNavigate();
   const user = getSession()?.user;
-  const [collapsed, setCollapsed] = useState(readCollapsed);
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(SIDEBAR_KEY) !== 'expanded');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const userRef = useRef(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = event => {
+      if (!userRef.current?.contains(event.target)) setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [menuOpen]);
 
   function toggle() {
     setCollapsed(!collapsed);
-    localStorage.setItem(COLLAPSED_KEY, String(!collapsed));
+    localStorage.setItem(SIDEBAR_KEY, collapsed ? 'expanded' : 'collapsed');
   }
 
   function logout() {
@@ -40,36 +56,55 @@ export default function Layout({ children }) {
     navigate('/login', { replace: true });
   }
 
+  const toggleLabel = collapsed ? 'Deschide meniul' : 'Închide meniul';
+
   return (
     <div className={collapsed ? 'layout collapsed' : 'layout'}>
       <aside className="sidebar">
-        <Link to="/" className="sidebar-logo">
-          <img src={logo} alt="Academia de Studii Economice din București" />
-        </Link>
-
-        <nav className="sidebar-nav">
-          <NavLink to="/" end className="sidebar-link" title="Cursurile mele">
-            <Icon path={ICONS.courses} />
-            <span>Cursurile mele</span>
-          </NavLink>
-        </nav>
-
-        <div className="sidebar-footer">
-          <div className="sidebar-user" title={user?.name}>{user?.name}</div>
-          <button type="button" className="sidebar-link" onClick={logout} title="Ieșire">
-            <Icon path={ICONS.logout} />
-            <span>Ieșire</span>
+        <div className="sidebar-inner">
+          <button type="button" className="sidebar-link sidebar-menu" onClick={toggle} title={toggleLabel} aria-label={toggleLabel}>
+            <Icon name="menu" />
           </button>
-          <button
-            type="button"
-            className="sidebar-link"
-            onClick={toggle}
-            title={collapsed ? 'Extinde meniul' : 'Restrânge meniul'}
-          >
-            <Icon path={collapsed ? ICONS.expand : ICONS.collapse} />
-            <span>Restrânge</span>
-          </button>
+
+          <Link to="/" className="sidebar-logo">
+            <img src={logo} alt="Academia de Studii Economice din București" />
+          </Link>
+
+          <nav className="sidebar-nav">
+            <NavLink to="/" end className="sidebar-link" title="Cursurile mele">
+              <Icon name="courses" />
+              <span>Cursurile mele</span>
+            </NavLink>
+          </nav>
+
+          <div className="sidebar-footer" ref={userRef}>
+            <button
+              type="button"
+              className="user-button"
+              onClick={() => setMenuOpen(!menuOpen)}
+              title={user?.name}
+              aria-expanded={menuOpen}
+            >
+              <span className="avatar">{initials(user?.name)}</span>
+              <Icon name="down" />
+            </button>
+
+            {menuOpen && (
+              <div className="user-menu">
+                <div className="user-menu-name">{user?.name}</div>
+                <div className="user-menu-email">{user?.email}</div>
+                <button type="button" className="user-menu-item" onClick={logout}>
+                  <Icon name="logout" />
+                  Ieșire
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+
+        <button type="button" className="sidebar-toggle" onClick={toggle} title={toggleLabel} aria-label={toggleLabel}>
+          <Icon name={collapsed ? 'right' : 'left'} />
+        </button>
       </aside>
 
       <main className="page">{children}</main>
