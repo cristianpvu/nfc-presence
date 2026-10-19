@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
-import Header from '../components/Header';
+import Layout from '../components/Layout';
 import { formatDate, formatInterval, hasEnded, isLive } from '../format';
 
 const PAGE_SIZE = 15;
@@ -38,57 +38,54 @@ export default function Courses() {
   const goTo = target => setSearchParams({ page: String(target) });
 
   return (
-    <>
-      <Header />
-      <main className="page">
-        <h2 className="page-title">Cursurile mele</h2>
-        {error && <div className="alert alert-danger">{error}</div>}
-        {!courses && !error && <p className="muted">Se încarcă...</p>}
-        {courses?.length === 0 && <p className="muted">Nu aveți cursuri.</p>}
-        {courses?.length > 0 && (
-          <>
-            <div className="card">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Curs</th>
-                    <th>Data</th>
-                    <th>Interval</th>
-                    <th>Sala</th>
+    <Layout>
+      <h2 className="page-title">Cursurile mele</h2>
+      {error && <div className="alert alert-danger">{error}</div>}
+      {!courses && !error && <p className="muted">Se încarcă...</p>}
+      {courses?.length === 0 && <p className="muted">Nu aveți cursuri.</p>}
+      {courses?.length > 0 && (
+        <>
+          <div className="card">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Curs</th>
+                  <th>Data</th>
+                  <th>Interval</th>
+                  <th>Sala</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map(course => (
+                  <tr key={course._id} className={isLive(course) ? 'row-live' : undefined}>
+                    <td><Link to={`/courses/${course._id}`}>{course.name}</Link></td>
+                    <td>{formatDate(course.startsAt)}</td>
+                    <td>{formatInterval(course)}</td>
+                    <td>{course.room.name}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {visible.map(course => (
-                    <tr key={course._id} className={isLive(course) ? 'row-live' : undefined}>
-                      <td><Link to={`/courses/${course._id}`}>{course.name}</Link></td>
-                      <td>{formatDate(course.startsAt)}</td>
-                      <td>{formatInterval(course)}</td>
-                      <td>{course.room.name}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {pageCount > 1 && (
-              <nav className="pagination" aria-label="Paginare">
-                <button type="button" className="page-link" disabled={page === 1} onClick={() => goTo(page - 1)}>«</button>
-                {Array.from({ length: pageCount }, (_, index) => index + 1).map(number => (
-                  <button
-                    key={number}
-                    type="button"
-                    className={number === page ? 'page-link active' : 'page-link'}
-                    onClick={() => goTo(number)}
-                  >
-                    {number}
-                  </button>
                 ))}
-                <button type="button" className="page-link" disabled={page === pageCount} onClick={() => goTo(page + 1)}>»</button>
-              </nav>
-            )}
-          </>
-        )}
-      </main>
-    </>
+              </tbody>
+            </table>
+          </div>
+
+          {pageCount > 1 && (
+            <nav className="pagination" aria-label="Paginare">
+              <button type="button" className="page-link" disabled={page === 1} onClick={() => goTo(page - 1)}>«</button>
+              {Array.from({ length: pageCount }, (_, index) => index + 1).map(number => (
+                <button
+                  key={number}
+                  type="button"
+                  className={number === page ? 'page-link active' : 'page-link'}
+                  onClick={() => goTo(number)}
+                >
+                  {number}
+                </button>
+              ))}
+              <button type="button" className="page-link" disabled={page === pageCount} onClick={() => goTo(page + 1)}>»</button>
+            </nav>
+          )}
+        </>
+      )}
+    </Layout>
   );
 }

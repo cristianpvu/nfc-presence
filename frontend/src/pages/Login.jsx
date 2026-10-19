@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { getSession, saveSession } from '../session';
+import logo from '../assets/ase-logo.png';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function Login() {
   return (
     <main className="login-page">
       <div className="card login-card">
-        <h1 className="login-title">Prezență NFC</h1>
+        <img className="login-logo" src={logo} alt="Academia de Studii Economice din București" />
         {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={submit}>
           <label className="form-label" htmlFor="email">Adresă de email</label>
