@@ -18,14 +18,5 @@ export const formatDate = value => dateFormat.format(new Date(value));
 export const formatTime = value => timeFormat.format(new Date(value));
 export const formatInterval = course => `${formatTime(course.startsAt)} – ${formatTime(course.endsAt)}`;
 
-export const STATUS_LABELS = {
-  upcoming: 'Programat',
-  live: 'În desfășurare',
-  ended: 'Încheiat',
-};
-
-export function courseStatus(course, now = Date.now()) {
-  if (now < new Date(course.startsAt).getTime()) return 'upcoming';
-  if (now > new Date(course.endsAt).getTime()) return 'ended';
-  return 'live';
-}
+export const hasEnded = (course, now = Date.now()) => now > new Date(course.endsAt).getTime();
+export const isLive = (course, now = Date.now()) => now >= new Date(course.startsAt).getTime() && !hasEnded(course, now);

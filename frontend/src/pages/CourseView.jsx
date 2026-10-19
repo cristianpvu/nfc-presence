@@ -5,7 +5,7 @@ import { API_URL, api } from '../api';
 import { getSession } from '../session';
 import Header from '../components/Header';
 import SeatMap from '../components/SeatMap';
-import { STATUS_LABELS, courseStatus, formatDate, formatInterval, formatTime } from '../format';
+import { formatDate, formatInterval, formatTime } from '../format';
 
 export default function CourseView() {
   const { id } = useParams();
@@ -57,7 +57,6 @@ export default function CourseView() {
   }
 
   const { course, desks, attendances } = data;
-  const status = courseStatus(course);
 
   return (
     <>
@@ -72,16 +71,12 @@ export default function CourseView() {
         <h2 className="page-title">{course.name}</h2>
         <p className="course-meta">
           {formatDate(course.startsAt)} · {formatInterval(course)} · {course.room.name}
-          <span className={`badge badge-${status}`}>{STATUS_LABELS[status]}</span>
         </p>
 
         <section className="card">
-          <div className="card-header">
-            <h3>Plan sală</h3>
-            <span className="muted">{attendances.length} din {desks.length} bănci ocupate</span>
-          </div>
           <div className="card-body">
             <SeatMap desks={desks} occupants={occupants} />
+            <p className="occupancy muted">{attendances.length} din {desks.length} bănci ocupate</p>
           </div>
         </section>
 
