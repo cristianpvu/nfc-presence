@@ -9,18 +9,18 @@ export default function SeatMap({ desks, occupants }) {
 
   const cols = Math.max(...desks.map(desk => desk.col));
   const rows = Math.max(...desks.map(desk => desk.row));
-  const top = PADDING + BOARD_HEIGHT + GAP * 3;
+  const boardTop = PADDING + rows * DESK_HEIGHT + (rows - 1) * GAP + GAP * 3;
   const width = PADDING * 2 + cols * DESK_WIDTH + (cols - 1) * GAP;
-  const height = top + rows * DESK_HEIGHT + (rows - 1) * GAP + PADDING;
+  const height = boardTop + BOARD_HEIGHT + PADDING;
 
   return (
     <svg className="seat-map" viewBox={`0 0 ${width} ${height}`} style={{ maxWidth: width }} role="img" aria-label="Plan sală">
-      <rect className="board" x={PADDING} y={PADDING} width={width - PADDING * 2} height={BOARD_HEIGHT} rx="4" />
-      <text className="board-label" x={width / 2} y={PADDING + BOARD_HEIGHT / 2}>Catedră</text>
+      <rect className="board" x={PADDING} y={boardTop} width={width - PADDING * 2} height={BOARD_HEIGHT} rx="4" />
+      <text className="board-label" x={width / 2} y={boardTop + BOARD_HEIGHT / 2}>Catedră</text>
       {desks.map(desk => {
         const name = occupants.get(desk._id);
         const x = PADDING + (desk.col - 1) * (DESK_WIDTH + GAP);
-        const y = top + (desk.row - 1) * (DESK_HEIGHT + GAP);
+        const y = PADDING + (rows - desk.row) * (DESK_HEIGHT + GAP);
         return (
           <g key={desk._id} className={name ? 'desk taken' : 'desk'}>
             <title>{name ? `${desk.label}: ${name}` : desk.label}</title>
