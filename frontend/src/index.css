@@ -776,12 +776,12 @@ h1, h2, h3 {
 }
 
 .desk.taken rect {
-  fill: #dbe9f6;
-  stroke: var(--primary);
+  fill: var(--success-bg);
+  stroke: var(--success);
 }
 
 .desk.taken text {
-  fill: var(--primary);
+  fill: var(--success);
   font-weight: 700;
 }
 
