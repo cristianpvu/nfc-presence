@@ -6,12 +6,10 @@ import logo from '../assets/ase-logo.png';
 const SIDEBAR_KEY = 'sidebar';
 
 const ICONS = {
-  menu: 'M4 6h16M4 12h16M4 18h16',
   courses: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
   logout: 'M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 8l-4 4 4 4M6 12h10',
   left: 'M15 6l-6 6 6 6',
   right: 'M9 6l6 6-6 6',
-  down: 'M6 9l6 6 6-6',
 };
 
 function Icon({ name }) {
@@ -62,10 +60,6 @@ export default function Layout({ children }) {
     <div className={collapsed ? 'layout collapsed' : 'layout'}>
       <aside className="sidebar">
         <div className="sidebar-inner">
-          <button type="button" className="sidebar-link sidebar-menu" onClick={toggle} title={toggleLabel} aria-label={toggleLabel}>
-            <Icon name="menu" />
-          </button>
-
           <Link to="/" className="sidebar-logo">
             <img src={logo} alt="Academia de Studii Economice din București" />
           </Link>
@@ -82,11 +76,14 @@ export default function Layout({ children }) {
               type="button"
               className="user-button"
               onClick={() => setMenuOpen(!menuOpen)}
-              title={user?.name}
+              title={`${user?.name}\n${user?.email}`}
               aria-expanded={menuOpen}
             >
               <span className="avatar">{initials(user?.name)}</span>
-              <Icon name="down" />
+              <span className="user-info">
+                <span className="user-name">{user?.name}</span>
+                <span className="user-email">{user?.email}</span>
+              </span>
             </button>
 
             {menuOpen && (
