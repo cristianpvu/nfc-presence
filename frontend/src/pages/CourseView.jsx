@@ -94,7 +94,7 @@ export default function CourseView() {
       <section className="card">
         <div className="card-body">
           <SeatMap desks={desks} occupants={occupants} />
-          <p className="occupancy muted">{attendances.length} din {desks.length} bănci ocupate</p>
+          <p className="occupancy muted">{attendances.length} din {desks.length} locuri ocupate</p>
         </div>
       </section>
 
