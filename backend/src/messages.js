@@ -1,0 +1,15 @@
+module.exports = {
+  TAP_AGAIN: 'Atinge eticheta NFC de pe banca ta.',
+  UNKNOWN_DESK: 'Această etichetă nu este asociată niciunei bănci.',
+  NO_COURSE: 'Nu există niciun curs în desfășurare în această sală.',
+  COURSE_ENDED: 'Cursul s-a încheiat.',
+  SEAT_TAKEN: 'Prezența a fost deja înregistrată de pe această bancă.',
+  DEVICE_USED: 'Ai înregistrat deja prezența la acest curs de pe acest dispozitiv.',
+  INVALID_DEVICE: 'Dispozitivul nu a putut fi identificat.',
+  INVALID_NAME: 'Introdu numele și prenumele.',
+  NOT_FOUND: 'Nu a fost găsit.',
+  SERVER_ERROR: 'A apărut o eroare. Încearcă din nou.',
+  VERIFY_UNAVAILABLE: 'Serviciul de verificare NFC nu este disponibil. Încearcă din nou.',
+  INVALID_LOGIN: 'Email sau parolă incorectă.',
+  SESSION_EXPIRED: 'Sesiunea a expirat. Autentifică-te din nou.',
+};
