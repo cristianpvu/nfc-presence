@@ -4,7 +4,7 @@ const GAP = 10;
 const PADDING = 16;
 const BOARD_HEIGHT = 32;
 
-export default function SeatMap({ desks, occupants }) {
+export default function SeatMap({ desks, occupants, onSelect }) {
   if (desks.length === 0) return <p className="muted">Sala nu are bănci configurate.</p>;
 
   const cols = Math.max(...desks.map(desk => desk.col));
@@ -18,12 +18,20 @@ export default function SeatMap({ desks, occupants }) {
       <rect className="board" x={PADDING} y={boardTop} width={width - PADDING * 2} height={BOARD_HEIGHT} rx="4" />
       <text className="board-label" x={width / 2} y={boardTop + BOARD_HEIGHT / 2}>Catedră</text>
       {desks.map(desk => {
-        const name = occupants.get(desk._id);
+        const taken = occupants.has(desk._id);
         const x = PADDING + (desk.col - 1) * (DESK_WIDTH + GAP);
         const y = PADDING + (rows - desk.row) * (DESK_HEIGHT + GAP);
+        const select = () => taken && onSelect(desk);
         return (
-          <g key={desk._id} className={name ? 'desk taken' : 'desk'}>
-            <title>{name ? `${desk.label}: ${name}` : desk.label}</title>
+          <g
+            key={desk._id}
+            className={taken ? 'desk taken' : 'desk'}
+            onClick={select}
+            onKeyDown={event => event.key === 'Enter' && select()}
+            tabIndex={taken ? 0 : undefined}
+            role={taken ? 'button' : undefined}
+          >
+            <title>{desk.label}</title>
             <rect x={x} y={y} width={DESK_WIDTH} height={DESK_HEIGHT} rx="4" />
             <text x={x + DESK_WIDTH / 2} y={y + DESK_HEIGHT / 2}>{desk.label}</text>
           </g>

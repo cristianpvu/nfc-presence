@@ -6,7 +6,7 @@ module.exports = {
   SEAT_TAKEN: 'Prezența a fost deja înregistrată folosind această etichetă NFC.',
   DEVICE_USED: 'Ai înregistrat deja prezența de pe acest dispozitiv.',
   INVALID_DEVICE: 'Dispozitivul nu a putut fi identificat.',
-  INVALID_NAME: 'Introdu numele și prenumele.',
+  INVALID_NAME: 'Introdu numele complet.',
   NOT_FOUND: 'Nu a fost găsit.',
   SERVER_ERROR: 'A apărut o eroare. Încearcă din nou.',
   VERIFY_UNAVAILABLE: 'Serviciul de verificare NFC nu este disponibil. Încearcă din nou.',

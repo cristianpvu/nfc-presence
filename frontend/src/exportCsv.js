@@ -12,10 +12,10 @@ const csvField = value => `"${String(value).replace(/"/g, '""')}"`;
 
 export function exportAttendance(course, attendances, deskLabels) {
   const rows = [
-    ['Nume și prenume', 'Banca', 'Ora'],
+    ['Nume complet', 'Banca', 'Ora'],
     ...attendances.map(item => [item.studentName, deskLabels.get(item.desk) ?? '', formatTime(item.createdAt)]),
   ];
-  const csv = '﻿' + rows.map(row => row.map(csvField).join(',')).join('\r\n');
+  const csv = '\uFEFF' + rows.map(row => row.map(csvField).join(',')).join('\r\n');
 
   const fileTime = value => formatTime(value).replace(':', '.');
   const interval = `${fileTime(course.startsAt)}-${fileTime(course.endsAt)}`;

@@ -39,7 +39,7 @@ export default function Scan() {
     event.preventDefault();
     const studentName = name.trim().replace(/\s+/g, ' ');
     if (studentName.length < 3) {
-      setFormError('Introdu numele și prenumele.');
+      setFormError('Introdu numele complet.');
       return;
     }
 
@@ -75,7 +75,7 @@ export default function Scan() {
 
         {state.step === 'form' && (
           <form onSubmit={submit} noValidate>
-            <label className="form-label" htmlFor="studentName">Nume și prenume</label>
+            <label className="form-label" htmlFor="studentName">Nume complet</label>
             <input
               id="studentName"
               className="form-control"
