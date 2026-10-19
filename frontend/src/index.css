@@ -381,8 +381,19 @@ h1, h2, h3 {
   background: #f5f5f5;
 }
 
-.table tbody tr.row-live {
-  background: var(--success-bg);
+.table tbody tr.row-live td:last-child {
+  position: relative;
+}
+
+.table tbody tr.row-live td:last-child::after {
+  content: '';
+  position: absolute;
+  top: 0.625rem;
+  right: 0.5rem;
+  bottom: 0.625rem;
+  width: 4px;
+  border-radius: 2px;
+  background: #6cc070;
 }
 
 .pagination {
