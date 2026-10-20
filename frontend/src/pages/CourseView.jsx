@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { API_URL, api } from '../api';
@@ -20,8 +20,9 @@ export default function CourseView() {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const [selectedDeskId, setSelectedDeskId] = useState(null);
+  const [selection, setSelection] = useState(null);
   const mapRef = useRef(null);
+  const selectFromMap = useCallback(deskId => setSelection(deskId && { deskId, fromList: false }), []);
 
   useEffect(() => {
     let active = true;
@@ -82,7 +83,7 @@ export default function CourseView() {
   }
 
   function showOnMap(item) {
-    setSelectedDeskId(item.desk);
+    setSelection({ deskId: item.desk, fromList: true });
     mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
@@ -127,7 +128,13 @@ export default function CourseView() {
 
       <section className="card" ref={mapRef}>
         <div className="card-body">
-          <SeatMap desks={desks} occupants={occupants} selectedId={selectedDeskId} onSelect={setSelectedDeskId} />
+          <SeatMap
+            desks={desks}
+            occupants={occupants}
+            selectedId={selection?.deskId}
+            highlighted={selection?.fromList}
+            onSelect={selectFromMap}
+          />
           <p className="occupancy muted">{attendances.length} din {desks.length} locuri ocupate</p>
         </div>
       </section>
@@ -160,7 +167,7 @@ export default function CourseView() {
               {rows.slice(firstIndex, firstIndex + PAGE_SIZE).map(({ item, number }) => (
                 <tr
                   key={item._id}
-                  className={item.desk === selectedDeskId ? 'attendance-row selected' : 'attendance-row'}
+                  className={selection?.fromList && item.desk === selection.deskId ? 'attendance-row selected' : 'attendance-row'}
                   onClick={() => showOnMap(item)}
                   onKeyDown={event => event.key === 'Enter' && showOnMap(item)}
                   tabIndex={0}

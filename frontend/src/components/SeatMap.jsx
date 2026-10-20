@@ -12,7 +12,7 @@ const NAME_LINE_HEIGHT = 12;
 const NAME_MAX_WIDTH = DESK_WIDTH - 8;
 const MIN_NAME_SCALE = 0.8;
 
-export default function SeatMap({ desks, occupants, selectedId, onSelect }) {
+export default function SeatMap({ desks, occupants, selectedId, highlighted, onSelect }) {
   const [scale, setScale] = useState(1);
   const popoverRef = useRef(null);
   const wrapRef = useRef(null);
@@ -110,7 +110,7 @@ export default function SeatMap({ desks, occupants, selectedId, onSelect }) {
         {desks.map(desk => {
           const occupant = occupants.get(desk._id);
           const { x, y } = position(desk);
-          const classes = ['desk', occupant && 'taken', desk._id === selectedId && 'selected'].filter(Boolean).join(' ');
+          const classes = ['desk', occupant && 'taken', desk._id === selectedId && (highlighted ? 'highlighted' : 'selected')].filter(Boolean).join(' ');
           return (
             <g
               key={desk._id}

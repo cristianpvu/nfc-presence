@@ -953,14 +953,19 @@ select.form-control {
   font-weight: 700;
 }
 
-.desk.selected rect,
-.desk.taken.selected:hover rect {
+.desk.selected rect {
+  fill: #c5dbf0;
+  stroke-width: 2;
+}
+
+.desk.highlighted rect,
+.desk.taken.highlighted:hover rect {
   fill: var(--success-bg);
   stroke: var(--success);
   stroke-width: 2;
 }
 
-.desk.taken.selected text {
+.desk.taken.highlighted text {
   fill: var(--success);
 }
 
@@ -989,6 +994,10 @@ select.form-control {
   height: 16px;
   color: var(--muted);
   pointer-events: none;
+}
+
+.search .form-control::-webkit-search-cancel-button {
+  cursor: pointer;
 }
 
 .search .form-control {
