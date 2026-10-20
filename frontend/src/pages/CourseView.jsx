@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { API_URL, api } from '../api';
@@ -10,6 +10,7 @@ import Pagination from '../components/Pagination';
 import SeatMap from '../components/SeatMap';
 import { formatDate, formatInterval, formatTime } from '../format';
 import { exportAttendance } from '../exportCsv';
+import { searchable } from '../names';
 
 const PAGE_SIZE = 15;
 
@@ -18,6 +19,9 @@ export default function CourseView() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [selectedDeskId, setSelectedDeskId] = useState(null);
+  const mapRef = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -76,7 +80,22 @@ export default function CourseView() {
       window.alert(err.message);
     }
   }
-  const pageCount = Math.max(1, Math.ceil(attendances.length / PAGE_SIZE));
+
+  function showOnMap(item) {
+    setSelectedDeskId(item.desk);
+    mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function updateSearch(event) {
+    setSearch(event.target.value);
+    setPage(1);
+  }
+
+  const query = searchable(search.trim());
+  const rows = attendances
+    .map((item, index) => ({ item, number: index + 1 }))
+    .filter(({ item }) => !query || searchable(item.studentName).includes(query) || searchable(item.studentId).includes(query));
+  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
   const firstIndex = (currentPage - 1) * PAGE_SIZE;
 
@@ -106,9 +125,9 @@ export default function CourseView() {
         {formatDate(course.startsAt)} · {formatInterval(course)} · {course.room.name}
       </p>
 
-      <section className="card">
+      <section className="card" ref={mapRef}>
         <div className="card-body">
-          <SeatMap desks={desks} occupants={occupants} />
+          <SeatMap desks={desks} occupants={occupants} selectedId={selectedDeskId} onSelect={setSelectedDeskId} />
           <p className="occupancy muted">{attendances.length} din {desks.length} locuri ocupate</p>
         </div>
       </section>
@@ -116,10 +135,16 @@ export default function CourseView() {
       <section className="card">
         <div className="card-header">
           <h3>Studenți prezenți</h3>
+          {attendances.length > 0 && (
+            <label className="search">
+              <Icon name="search" />
+              <input className="form-control" type="search" value={search} onChange={updateSearch} placeholder="Caută" aria-label="Caută" />
+            </label>
+          )}
         </div>
-        {attendances.length === 0 ? (
-          <p className="card-body muted">Niciun student nu și-a înregistrat încă prezența.</p>
-        ) : (
+        {attendances.length === 0 && <p className="card-body muted">Niciun student nu și-a înregistrat încă prezența.</p>}
+        {attendances.length > 0 && rows.length === 0 && <p className="card-body muted">Niciun student găsit.</p>}
+        {rows.length > 0 && (
           <table className="table">
             <thead>
               <tr>
@@ -132,15 +157,21 @@ export default function CourseView() {
               </tr>
             </thead>
             <tbody>
-              {attendances.slice(firstIndex, firstIndex + PAGE_SIZE).map((item, index) => (
-                <tr key={item._id}>
-                  <td>{firstIndex + index + 1}</td>
+              {rows.slice(firstIndex, firstIndex + PAGE_SIZE).map(({ item, number }) => (
+                <tr
+                  key={item._id}
+                  className={item.desk === selectedDeskId ? 'attendance-row selected' : 'attendance-row'}
+                  onClick={() => showOnMap(item)}
+                  onKeyDown={event => event.key === 'Enter' && showOnMap(item)}
+                  tabIndex={0}
+                >
+                  <td>{number}</td>
                   <td>{item.studentName}</td>
                   <td>{item.studentId || '—'}</td>
                   <td>{deskLabels.get(item.desk)}</td>
                   <td>{formatTime(item.createdAt)}</td>
                   {admin && (
-                    <td className="table-actions">
+                    <td className="table-actions" onClick={event => event.stopPropagation()}>
                       <IconButton icon="trash" label="Șterge prezența" onClick={() => removeAttendance(item)} danger />
                     </td>
                   )}

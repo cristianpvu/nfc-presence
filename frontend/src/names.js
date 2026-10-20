@@ -6,6 +6,8 @@ export function initials(name = '') {
   return (first + last).toUpperCase();
 }
 
+export const searchable = text => (text ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+
 let measureContext;
 
 function measure(text, font) {

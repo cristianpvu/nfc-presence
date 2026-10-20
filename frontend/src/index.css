@@ -953,9 +953,48 @@ select.form-control {
   font-weight: 700;
 }
 
-.desk.selected rect {
-  fill: #c5dbf0;
+.desk.selected rect,
+.desk.taken.selected:hover rect {
+  fill: var(--success-bg);
+  stroke: var(--success);
   stroke-width: 2;
+}
+
+.desk.taken.selected text {
+  fill: var(--success);
+}
+
+.attendance-row {
+  cursor: pointer;
+}
+
+.table tbody tr.attendance-row.selected {
+  background: var(--success-bg);
+}
+
+.attendance-row:focus {
+  outline: none;
+}
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search .icon {
+  position: absolute;
+  left: 0.625rem;
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.search .form-control {
+  width: 220px;
+  padding: 0.25rem 0.75rem 0.25rem 2rem;
+  font-size: 0.875rem;
 }
 
 .seat-map-wrap {

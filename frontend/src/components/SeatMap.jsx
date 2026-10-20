@@ -12,8 +12,7 @@ const NAME_LINE_HEIGHT = 12;
 const NAME_MAX_WIDTH = DESK_WIDTH - 8;
 const MIN_NAME_SCALE = 0.8;
 
-export default function SeatMap({ desks, occupants }) {
-  const [selectedId, setSelectedId] = useState(null);
+export default function SeatMap({ desks, occupants, selectedId, onSelect }) {
   const [scale, setScale] = useState(1);
   const popoverRef = useRef(null);
   const wrapRef = useRef(null);
@@ -35,16 +34,16 @@ export default function SeatMap({ desks, occupants }) {
     if (!selectedId) return;
     const close = event => {
       if (popoverRef.current?.contains(event.target) || event.target.closest('.desk.taken')) return;
-      setSelectedId(null);
+      onSelect(null);
     };
-    const closeOnEscape = event => event.key === 'Escape' && setSelectedId(null);
+    const closeOnEscape = event => event.key === 'Escape' && onSelect(null);
     document.addEventListener('mousedown', close);
     document.addEventListener('keydown', closeOnEscape);
     return () => {
       document.removeEventListener('mousedown', close);
       document.removeEventListener('keydown', closeOnEscape);
     };
-  }, [selectedId]);
+  }, [selectedId, onSelect]);
 
   if (desks.length === 0) return <p className="muted">Sala nu are bănci configurate.</p>;
 
@@ -56,7 +55,7 @@ export default function SeatMap({ desks, occupants }) {
     y: PADDING + (rows - desk.row) * (DESK_HEIGHT + GAP),
   });
 
-  const toggle = desk => setSelectedId(current => (current === desk._id ? null : desk._id));
+  const toggle = desk => onSelect(selectedId === desk._id ? null : desk._id);
 
   function deskText(desk, x, y) {
     const centerX = x + DESK_WIDTH / 2;
