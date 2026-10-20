@@ -80,10 +80,6 @@ export default function AdminRooms() {
           </Field>
           <Field label="Configurație" wide>
             <textarea className="form-control layout-input" value={form.layout} onChange={update('layout')} rows={8} spellCheck={false} />
-            <span className="field-help">
-              Câte o linie pentru fiecare rând, de la spate spre catedră. Numerele sunt grupurile de bănci separate de
-              culoar (ex. <code>8 8</code>), <code>-</code> este un culoar între rânduri, iar <code>5 x 8 8</code> înseamnă 5 rânduri la fel.
-            </span>
           </Field>
           <Field label="Previzualizare" wide>
             <LayoutPreview layout={form.layout} />

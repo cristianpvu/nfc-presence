@@ -820,18 +820,6 @@ h1, h2, h3 {
   grid-column: 1 / -1;
 }
 
-.field-help {
-  font-size: 0.8125rem;
-  color: var(--muted);
-}
-
-.field-help code {
-  padding: 0 0.25rem;
-  font-size: 0.8125rem;
-  background: #f1f3f5;
-  border-radius: 0.25rem;
-}
-
 .layout-input {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.875rem;
