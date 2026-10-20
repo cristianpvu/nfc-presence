@@ -208,30 +208,8 @@ function nextDay(day) {
   return new Date(Date.UTC(year, month - 1, date + 1)).toISOString().slice(0, 10);
 }
 
-async function sharedValues(groupField, setField) {
-  const groups = await ScanLog.aggregate([
-    { $match: { event: 'attendance_ok', [groupField]: { $ne: null } } },
-    { $group: { _id: `$${groupField}`, values: { $addToSet: `$${setField}` } } },
-    { $match: { 'values.1': { $exists: true } } },
-  ]);
-  return groups.map(group => group._id);
-}
-
-async function logFilter(query) {
+function logFilter(query) {
   const conditions = [];
-  if (query.event === 'fraud') {
-    const [sharedBrowsers, sharedStudents] = await Promise.all([
-      sharedValues('browserId', 'studentId'),
-      sharedValues('studentId', 'browserId'),
-    ]);
-    conditions.push({ $or: [
-      { event: { $in: ScanLog.FRAUD_EVENTS } },
-      { event: 'attendance_ok', browserId: { $in: sharedBrowsers } },
-      { event: 'attendance_ok', studentId: { $in: sharedStudents } },
-    ] });
-  } else if (ScanLog.EVENTS.includes(query.event)) {
-    conditions.push({ event: query.event });
-  }
   if (mongoose.isValidObjectId(query.course)) conditions.push({ course: query.course });
   if (isDay(query.date)) {
     conditions.push({ at: { $gte: bucharestTime(query.date, '00:00'), $lt: bucharestTime(nextDay(query.date), '00:00') } });
@@ -244,31 +222,8 @@ async function logFilter(query) {
   return conditions.length ? { $and: conditions } : {};
 }
 
-async function groupSizes(match, groupField, setField) {
-  const groups = await ScanLog.aggregate([
-    { $match: match },
-    { $group: { _id: `$${groupField}`, values: { $addToSet: `$${setField}` }, count: { $sum: 1 } } },
-  ]);
-  return new Map(groups.map(group => [group._id, { distinct: group.values.length, count: group.count }]));
-}
-
-async function logFlags(logs) {
-  const browserIds = [...new Set(logs.map(log => log.browserId).filter(Boolean))];
-  const studentIds = [...new Set(logs.map(log => log.studentId).filter(Boolean))];
-  const [studentsPerBrowser, browsersPerStudent, invalidPerBrowser] = await Promise.all([
-    groupSizes({ event: 'attendance_ok', browserId: { $in: browserIds } }, 'browserId', 'studentId'),
-    groupSizes({ event: 'attendance_ok', studentId: { $in: studentIds } }, 'studentId', 'browserId'),
-    groupSizes({ event: 'link_invalid', browserId: { $in: browserIds } }, 'browserId', 'browserId'),
-  ]);
-  return log => [
-    studentsPerBrowser.get(log.browserId)?.distinct > 1 && 'multi_student',
-    browsersPerStudent.get(log.studentId)?.distinct > 1 && 'multi_browser',
-    invalidPerBrowser.get(log.browserId)?.count >= 3 && 'many_invalid',
-  ].filter(Boolean);
-}
-
 router.get('/logs', async (req, res) => {
-  const filter = await logFilter(req.query);
+  const filter = logFilter(req.query);
   const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
   const [total, logs] = await Promise.all([
     ScanLog.countDocuments(filter),
@@ -280,8 +235,7 @@ router.get('/logs', async (req, res) => {
       .populate('course', 'name startsAt')
       .lean(),
   ]);
-  const flagsFor = await logFlags(logs);
-  res.json({ logs: logs.map(log => ({ ...log, flags: flagsFor(log) })), total, page, pageSize: LOG_PAGE_SIZE });
+  res.json({ logs, total, page, pageSize: LOG_PAGE_SIZE });
 });
 
 module.exports = router;

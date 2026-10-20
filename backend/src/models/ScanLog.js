@@ -14,8 +14,6 @@ const EVENTS = [
   'verify_down',
 ];
 
-const FRAUD_EVENTS = ['link_invalid', 'browser_used', 'seat_taken', 'token_invalid'];
-
 const scanLogSchema = new Schema({
   at: { type: Date, default: Date.now },
   event: { type: String, enum: EVENTS, required: true },
@@ -37,4 +35,3 @@ scanLogSchema.index({ studentId: 1 });
 
 module.exports = model('ScanLog', scanLogSchema);
 module.exports.EVENTS = EVENTS;
-module.exports.FRAUD_EVENTS = FRAUD_EVENTS;

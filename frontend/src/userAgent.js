@@ -23,5 +23,5 @@ function system(userAgent) {
 export function describeUserAgent(userAgent = '') {
   const match = BROWSERS.map(([pattern, name]) => [userAgent.match(pattern), name]).find(([found]) => found);
   const browser = match ? `${match[1]} ${match[0][1]}` : null;
-  return [browser, system(userAgent)].filter(Boolean).join(' · ') || '—';
+  return [browser, system(userAgent)].filter(Boolean).join(', ') || '—';
 }
