@@ -7,7 +7,7 @@ const Desk = require('../models/Desk');
 const Course = require('../models/Course');
 const Attendance = require('../models/Attendance');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
-const { describeLayout, isValidLayout, syncDesks } = require('../layout');
+const { parseLayout, buildDesks, describeLayout, summarizeLayout, syncDesks } = require('../layout');
 const { bucharestTime, isDay, isTime } = require('../time');
 const { isValidPassword } = require('../validation');
 const { NOT_FOUND, INVALID_PASSWORD } = require('../messages');
@@ -74,14 +74,14 @@ router.delete('/users/:id', async (req, res) => {
 router.get('/rooms', async (req, res) => {
   const [rooms, desks] = await Promise.all([
     Room.find().sort({ name: 1 }),
-    Desk.find().select('room row col tagUid'),
+    Desk.find().select('room row col y tagUid'),
   ]);
   res.json(rooms.map(room => {
     const roomDesks = desks.filter(desk => String(desk.room) === String(room._id));
     return {
       _id: room._id,
       name: room.name,
-      ...describeLayout(roomDesks),
+      ...summarizeLayout(describeLayout(roomDesks)),
       deskCount: roomDesks.length,
       taggedCount: roomDesks.filter(desk => desk.tagUid).length,
     };
@@ -90,22 +90,21 @@ router.get('/rooms', async (req, res) => {
 
 async function saveRoom(req, res, room) {
   const name = text(req.body?.name);
-  const rows = Number(req.body?.rows);
-  const groups = Array.isArray(req.body?.groups) ? req.body.groups.map(Number) : [];
-
   if (!name) return fail(res, 400, 'Introdu numele sălii.');
-  if (!isValidLayout(rows, groups)) return fail(res, 400, 'Configurație invalidă a sălii.');
+  const lines = parseLayout(req.body?.layout);
+  if (await Room.exists({ name, _id: { $ne: room._id } })) return fail(res, 409, 'Există deja o sală cu acest nume.');
 
+  await syncDesks(room._id, lines);
   room.name = name;
-  try {
-    await room.save();
-  } catch (err) {
-    if (err.code === 11000) return fail(res, 409, 'Există deja o sală cu acest nume.');
-    throw err;
-  }
-  await syncDesks(room._id, rows, groups);
+  await room.save();
   res.json({ _id: room._id, name: room.name });
 }
+
+router.post('/layout-preview', (req, res) => {
+  const lines = parseLayout(req.body?.layout);
+  const desks = buildDesks(lines).map(desk => ({ _id: desk.label, ...desk }));
+  res.json({ desks, ...summarizeLayout(lines) });
+});
 
 router.post('/rooms', (req, res) => saveRoom(req, res, new Room()));
 

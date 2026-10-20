@@ -6,10 +6,9 @@ import Layout from '../../components/Layout';
 import FormCard, { Field } from '../../components/FormCard';
 import IconButton from '../../components/IconButton';
 import Icon from '../../components/Icon';
+import LayoutPreview from '../../components/LayoutPreview';
 
-const EMPTY = { name: '', rows: '5', groups: '4, 4' };
-
-const parseGroups = value => value.split(/[\s,+]+/).filter(Boolean).map(Number);
+const EMPTY = { name: '', layout: '5 x 4 4' };
 
 export default function AdminRooms() {
   const { data: rooms, error: loadError, reload } = useApi('/api/admin/rooms');
@@ -23,7 +22,7 @@ export default function AdminRooms() {
 
   function open(room) {
     setEditing(room);
-    setForm(room._id ? { name: room.name, rows: String(room.rows), groups: room.groups.join(', ') } : EMPTY);
+    setForm(room._id ? { name: room.name, layout: room.layout } : EMPTY);
     setFormError('');
   }
 
@@ -33,7 +32,7 @@ export default function AdminRooms() {
     try {
       await api(editing._id ? `/api/admin/rooms/${editing._id}` : '/api/admin/rooms', {
         method: editing._id ? 'PUT' : 'POST',
-        body: { name: form.name, rows: Number(form.rows), groups: parseGroups(form.groups) },
+        body: { name: form.name, layout: form.layout },
         auth: true,
       });
       setEditing(null);
@@ -79,11 +78,15 @@ export default function AdminRooms() {
           <Field label="Nume">
             <input className="form-control" value={form.name} onChange={update('name')} autoFocus />
           </Field>
-          <Field label="Rânduri">
-            <input className="form-control" type="number" min="1" max="50" value={form.rows} onChange={update('rows')} />
+          <Field label="Configurație" wide>
+            <textarea className="form-control layout-input" value={form.layout} onChange={update('layout')} rows={8} spellCheck={false} />
+            <span className="field-help">
+              Câte o linie pentru fiecare rând, de la spate spre catedră. Numerele sunt grupurile de bănci separate de
+              culoar (ex. <code>8 8</code>), <code>-</code> este un culoar între rânduri, iar <code>5 x 8 8</code> înseamnă 5 rânduri la fel.
+            </span>
           </Field>
-          <Field label="Bănci pe rând, pe grupuri (ex. 4, 4)">
-            <input className="form-control" value={form.groups} onChange={update('groups')} />
+          <Field label="Previzualizare" wide>
+            <LayoutPreview layout={form.layout} />
           </Field>
         </FormCard>
       )}
@@ -104,7 +107,10 @@ export default function AdminRooms() {
               {rooms.map(room => (
                 <tr key={room._id}>
                   <td><Link to={`/admin/rooms/${room._id}`}>{room.name}</Link></td>
-                  <td>{room.rows} rânduri · {room.groups.join(' + ')}</td>
+                  <td>
+                    {room.rows} rânduri{room.aisles > 0 && ` · ${room.aisles} ${room.aisles === 1 ? 'culoar' : 'culoare'}`}
+                    <div className="mono muted">{room.layout.split('\n').join(' / ')}</div>
+                  </td>
                   <td>{room.deskCount}</td>
                   <td>{room.taggedCount} / {room.deskCount}</td>
                   <td className="table-actions">

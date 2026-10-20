@@ -12,13 +12,16 @@ const NAME_LINE_HEIGHT = 12;
 const NAME_MAX_WIDTH = DESK_WIDTH - 8;
 const MIN_NAME_SCALE = 0.8;
 
+const deskX = desk => desk.x ?? desk.col;
+const deskY = desk => desk.y ?? desk.row;
+
 export default function SeatMap({ desks, occupants, selectedId, highlighted, onSelect }) {
   const [scale, setScale] = useState(1);
   const popoverRef = useRef(null);
   const wrapRef = useRef(null);
 
-  const cols = Math.max(1, ...desks.map(desk => desk.col));
-  const rows = Math.max(1, ...desks.map(desk => desk.row));
+  const cols = Math.max(1, ...desks.map(deskX));
+  const rows = Math.max(1, ...desks.map(deskY));
   const boardTop = PADDING + rows * DESK_HEIGHT + (rows - 1) * GAP + GAP * 3;
   const width = PADDING * 2 + cols * DESK_WIDTH + (cols - 1) * GAP;
   const height = boardTop + BOARD_HEIGHT + PADDING;
@@ -51,8 +54,8 @@ export default function SeatMap({ desks, occupants, selectedId, highlighted, onS
   const nameFont = `700 ${NAME_FONT_SIZE}px ${getComputedStyle(document.body).fontFamily}`;
 
   const position = desk => ({
-    x: PADDING + (desk.col - 1) * (DESK_WIDTH + GAP),
-    y: PADDING + (rows - desk.row) * (DESK_HEIGHT + GAP),
+    x: PADDING + (deskX(desk) - 1) * (DESK_WIDTH + GAP),
+    y: PADDING + (rows - deskY(desk)) * (DESK_HEIGHT + GAP),
   });
 
   const toggle = desk => onSelect(selectedId === desk._id ? null : desk._id);
@@ -81,13 +84,14 @@ export default function SeatMap({ desks, occupants, selectedId, highlighted, onS
   let popover = null;
   if (selected) {
     const { x, y } = position(selectedDesk);
-    const below = selectedDesk.row === rows;
+    const below = deskY(selectedDesk) === rows;
     const style = { top: `${((below ? y + DESK_HEIGHT : y) / height) * 100}%` };
+    const center = (x + DESK_WIDTH / 2) / width;
     let align = 'center';
-    if (selectedDesk.col === 1) {
+    if (center < 0.2) {
       style.left = `${(x / width) * 100}%`;
       align = 'start';
-    } else if (selectedDesk.col === cols) {
+    } else if (center > 0.8) {
       style.right = `${((width - x - DESK_WIDTH) / width) * 100}%`;
       align = 'end';
     } else {

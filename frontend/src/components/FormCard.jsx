@@ -1,6 +1,6 @@
-export function Field({ label, children }) {
+export function Field({ label, wide = false, children }) {
   return (
-    <label className="field">
+    <label className={wide ? 'field field-wide' : 'field'}>
       <span className="field-label">{label}</span>
       {children}
     </label>

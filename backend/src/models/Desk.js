@@ -5,6 +5,8 @@ const deskSchema = new Schema({
   label: { type: String, required: true },
   row: { type: Number, required: true },
   col: { type: Number, required: true },
+  x: { type: Number },
+  y: { type: Number },
   tagUid: { type: String, uppercase: true, unique: true, sparse: true },
 });
 

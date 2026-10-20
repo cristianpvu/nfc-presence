@@ -816,6 +816,42 @@ h1, h2, h3 {
   gap: 0.375rem;
 }
 
+.field-wide {
+  grid-column: 1 / -1;
+}
+
+.field-help {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.field-help code {
+  padding: 0 0.25rem;
+  font-size: 0.8125rem;
+  background: #f1f3f5;
+  border-radius: 0.25rem;
+}
+
+.layout-input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875rem;
+  resize: vertical;
+}
+
+.layout-preview {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+
+.layout-preview-map.stale {
+  opacity: 0.4;
+}
+
+.layout-preview .form-error {
+  margin: 0 0 0.75rem;
+}
+
 select.form-control {
   height: calc(1.5em + 0.75rem + 2px);
 }
