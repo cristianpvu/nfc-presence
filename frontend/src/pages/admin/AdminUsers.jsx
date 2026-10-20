@@ -96,7 +96,7 @@ export default function AdminUsers() {
               type="password"
               value={form.password}
               onChange={update('password')}
-              placeholder={editing._id ? 'Lasă gol pentru a o păstra' : `Minim ${MIN_PASSWORD_LENGTH} caractere`}
+              placeholder={editing._id ? 'Lasă gol pentru a o păstra' : ''}
               autoComplete="new-password"
             />
           </Field>

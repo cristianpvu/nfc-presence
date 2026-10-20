@@ -66,7 +66,6 @@ export default function ChangePasswordModal({ onClose }) {
               value={form.newPassword}
               onChange={update('newPassword')}
               autoComplete="new-password"
-              placeholder={`Minim ${MIN_PASSWORD_LENGTH} caractere`}
             />
           </label>
           <label className="field">
