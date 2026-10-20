@@ -8,6 +8,7 @@ import AdminCourses from './pages/admin/AdminCourses';
 import AdminRooms from './pages/admin/AdminRooms';
 import AdminRoomDesks from './pages/admin/AdminRoomDesks';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminLogs from './pages/admin/AdminLogs';
 
 function RequireAuth({ children }) {
   return getSession() ? children : <Navigate to="/login" replace />;
@@ -33,6 +34,7 @@ export default function App() {
       <Route path="/admin/rooms" element={<RequireAdmin><AdminRooms /></RequireAdmin>} />
       <Route path="/admin/rooms/:id" element={<RequireAdmin><AdminRoomDesks /></RequireAdmin>} />
       <Route path="/admin/users" element={<RequireAdmin><AdminUsers /></RequireAdmin>} />
+      <Route path="/admin/logs" element={<RequireAdmin><AdminLogs /></RequireAdmin>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

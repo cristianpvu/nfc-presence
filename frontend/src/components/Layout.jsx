@@ -14,6 +14,7 @@ const ADMIN_LINKS = [
   { to: '/admin/courses', label: 'Cursuri', icon: 'courses' },
   { to: '/admin/rooms', label: 'Săli', icon: 'rooms' },
   { to: '/admin/users', label: 'Utilizatori', icon: 'users' },
+  { to: '/admin/logs', label: 'Log', icon: 'log' },
 ];
 
 export default function Layout({ children }) {

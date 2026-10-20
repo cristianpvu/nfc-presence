@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const Course = require('../models/Course');
 const Attendance = require('../models/Attendance');
 const { isValidDeviceId, normalizeName } = require('../validation');
+const logScan = require('../scanLog');
 const { TAP_AGAIN, COURSE_ENDED, SEAT_TAKEN, DEVICE_USED, INVALID_DEVICE, INVALID_NAME, INVALID_STUDENT_ID } = require('../messages');
 
 const router = express.Router();
@@ -16,24 +17,37 @@ router.post('/', async (req, res) => {
   if (!studentId || studentId.length > 50) return res.status(400).json({ error: INVALID_STUDENT_ID });
   if (!isValidDeviceId(deviceId)) return res.status(400).json({ error: INVALID_DEVICE });
 
+  const student = { studentName, studentId };
   let scan;
   try {
     scan = jwt.verify(token, process.env.SCAN_TOKEN_SECRET);
   } catch {
+    logScan(req, 'token_invalid', student);
     return res.status(401).json({ error: TAP_AGAIN });
   }
-  if (scan.deviceId !== deviceId) return res.status(401).json({ error: TAP_AGAIN });
+  const place = { ...student, desk: scan.deskId, course: scan.courseId };
+  if (scan.deviceId !== deviceId) {
+    logScan(req, 'token_invalid', place);
+    return res.status(401).json({ error: TAP_AGAIN });
+  }
 
   const course = await Course.findById(scan.courseId);
-  if (!course || course.endsAt < new Date()) return res.status(410).json({ error: COURSE_ENDED });
+  if (!course || course.endsAt < new Date()) {
+    logScan(req, 'course_ended', place);
+    return res.status(410).json({ error: COURSE_ENDED });
+  }
 
   let attendance;
   try {
     attendance = await Attendance.create({ course: course._id, desk: scan.deskId, studentName, studentId, deviceId });
   } catch (err) {
     if (err.code !== 11000) throw err;
-    return res.status(409).json({ error: err.keyPattern?.deviceId ? DEVICE_USED : SEAT_TAKEN });
+    const browserUsed = Boolean(err.keyPattern?.deviceId);
+    logScan(req, browserUsed ? 'browser_used' : 'seat_taken', place);
+    return res.status(409).json({ error: browserUsed ? DEVICE_USED : SEAT_TAKEN });
   }
+
+  logScan(req, 'attendance_ok', place);
 
   const entry = {
     _id: attendance._id,

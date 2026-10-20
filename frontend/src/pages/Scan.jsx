@@ -4,14 +4,13 @@ import { getDeviceId } from '../session';
 import { formatInterval } from '../format';
 import logo from '../assets/ase-logo.png';
 
-const TAP_AGAIN = 'Atinge eticheta NFC de pe banca ta.';
 const normalize = value => value.trim().replace(/\s+/g, ' ');
 
 function readScanParams() {
   const query = new URLSearchParams(window.location.search);
   const params = Object.fromEntries(['picc', 'uid', 'ctr', 'cmac'].map(key => [key, query.get(key)]).filter(([, value]) => value));
   window.history.replaceState(null, '', window.location.pathname);
-  return params.cmac ? params : null;
+  return params;
 }
 
 export default function Scan() {
@@ -26,13 +25,7 @@ export default function Scan() {
     if (started.current) return;
     started.current = true;
 
-    const params = readScanParams();
-    if (!params) {
-      setState({ step: 'error', message: TAP_AGAIN });
-      return;
-    }
-
-    api('/api/scan', { method: 'POST', body: { ...params, deviceId: getDeviceId() } })
+    api('/api/scan', { method: 'POST', body: { ...readScanParams(), deviceId: getDeviceId() } })
       .then(scan => setState({ step: 'form', scan }))
       .catch(err => setState({ step: 'error', message: err.message }));
   }, []);
