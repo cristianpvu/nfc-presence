@@ -1,15 +1,35 @@
 import { useEffect, useRef, useState } from 'react';
 import { formatTime } from '../format';
+import { initials, nameLines } from '../names';
 
 const DESK_WIDTH = 64;
 const DESK_HEIGHT = 40;
 const GAP = 10;
 const PADDING = 16;
 const BOARD_HEIGHT = 32;
+const NAME_FONT_SIZE = 10;
+const NAME_LINE_HEIGHT = 12;
+const NAME_MAX_WIDTH = DESK_WIDTH - 8;
+const MIN_NAME_SCALE = 0.8;
 
 export default function SeatMap({ desks, occupants }) {
   const [selectedId, setSelectedId] = useState(null);
+  const [scale, setScale] = useState(1);
   const popoverRef = useRef(null);
+  const wrapRef = useRef(null);
+
+  const cols = Math.max(1, ...desks.map(desk => desk.col));
+  const rows = Math.max(1, ...desks.map(desk => desk.row));
+  const boardTop = PADDING + rows * DESK_HEIGHT + (rows - 1) * GAP + GAP * 3;
+  const width = PADDING * 2 + cols * DESK_WIDTH + (cols - 1) * GAP;
+  const height = boardTop + BOARD_HEIGHT + PADDING;
+
+  useEffect(() => {
+    if (!wrapRef.current) return;
+    const observer = new ResizeObserver(([entry]) => setScale(entry.contentRect.width / width));
+    observer.observe(wrapRef.current);
+    return () => observer.disconnect();
+  }, [width]);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -28,11 +48,8 @@ export default function SeatMap({ desks, occupants }) {
 
   if (desks.length === 0) return <p className="muted">Sala nu are bănci configurate.</p>;
 
-  const cols = Math.max(...desks.map(desk => desk.col));
-  const rows = Math.max(...desks.map(desk => desk.row));
-  const boardTop = PADDING + rows * DESK_HEIGHT + (rows - 1) * GAP + GAP * 3;
-  const width = PADDING * 2 + cols * DESK_WIDTH + (cols - 1) * GAP;
-  const height = boardTop + BOARD_HEIGHT + PADDING;
+  const showNames = scale >= MIN_NAME_SCALE;
+  const nameFont = `700 ${NAME_FONT_SIZE}px ${getComputedStyle(document.body).fontFamily}`;
 
   const position = desk => ({
     x: PADDING + (desk.col - 1) * (DESK_WIDTH + GAP),
@@ -40,6 +57,24 @@ export default function SeatMap({ desks, occupants }) {
   });
 
   const toggle = desk => setSelectedId(current => (current === desk._id ? null : desk._id));
+
+  function deskText(desk, x, y) {
+    const centerX = x + DESK_WIDTH / 2;
+    const centerY = y + DESK_HEIGHT / 2;
+    const occupant = occupants.get(desk._id);
+    if (!occupant) return <text x={centerX} y={centerY}>{desk.label}</text>;
+    if (!showNames) return <text x={centerX} y={centerY}>{initials(occupant.studentName)}</text>;
+
+    const lines = nameLines(occupant.studentName, NAME_MAX_WIDTH, nameFont);
+    const firstY = centerY - ((lines.length - 1) * NAME_LINE_HEIGHT) / 2;
+    return (
+      <text className="desk-name">
+        {lines.map((line, index) => (
+          <tspan key={index} x={centerX} y={firstY + index * NAME_LINE_HEIGHT}>{line}</tspan>
+        ))}
+      </text>
+    );
+  }
 
   const selectedDesk = desks.find(desk => desk._id === selectedId);
   const selected = selectedDesk && occupants.get(selectedDesk._id);
@@ -69,26 +104,26 @@ export default function SeatMap({ desks, occupants }) {
   }
 
   return (
-    <div className="seat-map-wrap" style={{ maxWidth: width }}>
+    <div ref={wrapRef} className="seat-map-wrap" style={{ maxWidth: width }}>
       <svg className="seat-map" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Plan sală">
         <rect className="board" x={PADDING} y={boardTop} width={width - PADDING * 2} height={BOARD_HEIGHT} rx="4" />
         <text className="board-label" x={width / 2} y={boardTop + BOARD_HEIGHT / 2}>Catedră</text>
         {desks.map(desk => {
-          const taken = occupants.has(desk._id);
+          const occupant = occupants.get(desk._id);
           const { x, y } = position(desk);
-          const classes = ['desk', taken && 'taken', desk._id === selectedId && 'selected'].filter(Boolean).join(' ');
+          const classes = ['desk', occupant && 'taken', desk._id === selectedId && 'selected'].filter(Boolean).join(' ');
           return (
             <g
               key={desk._id}
               className={classes}
-              onClick={() => taken && toggle(desk)}
-              onKeyDown={event => taken && event.key === 'Enter' && toggle(desk)}
-              tabIndex={taken ? 0 : undefined}
-              role={taken ? 'button' : undefined}
+              onClick={() => occupant && toggle(desk)}
+              onKeyDown={event => occupant && event.key === 'Enter' && toggle(desk)}
+              tabIndex={occupant ? 0 : undefined}
+              role={occupant ? 'button' : undefined}
             >
-              <title>{desk.label}</title>
+              <title>{occupant ? `${desk.label} · ${occupant.studentName}` : desk.label}</title>
               <rect x={x} y={y} width={DESK_WIDTH} height={DESK_HEIGHT} rx="4" />
-              <text x={x + DESK_WIDTH / 2} y={y + DESK_HEIGHT / 2}>{desk.label}</text>
+              {deskText(desk, x, y)}
             </g>
           );
         })}

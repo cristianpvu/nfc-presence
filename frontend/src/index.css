@@ -940,6 +940,14 @@ select.form-control {
   outline: none;
 }
 
+.seat-map tspan {
+  dominant-baseline: central;
+}
+
+.desk.taken .desk-name {
+  font-size: 10px;
+}
+
 .desk.taken text {
   fill: var(--primary);
   font-weight: 700;

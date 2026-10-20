@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { clearSession, getSession, isAdmin } from '../session';
 import Icon from './Icon';
+import { initials } from '../names';
 import ChangePasswordModal from './ChangePasswordModal';
 import logo from '../assets/ase-logo.png';
 
@@ -14,14 +15,6 @@ const ADMIN_LINKS = [
   { to: '/admin/rooms', label: 'Săli', icon: 'rooms' },
   { to: '/admin/users', label: 'Utilizatori', icon: 'users' },
 ];
-
-function initials(name = '') {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return '?';
-  const first = words[0][0];
-  const last = words.length > 1 ? words[words.length - 1][0] : '';
-  return (first + last).toUpperCase();
-}
 
 export default function Layout({ children }) {
   const navigate = useNavigate();
