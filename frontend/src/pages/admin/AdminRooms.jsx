@@ -8,7 +8,7 @@ import IconButton from '../../components/IconButton';
 import Icon from '../../components/Icon';
 import LayoutPreview from '../../components/LayoutPreview';
 
-const EMPTY = { name: '', layout: '5 x 4 4' };
+const EMPTY = { name: '', layout: '5 x 4 4\n-\n4 4' };
 
 export default function AdminRooms() {
   const { data: rooms, error: loadError, reload } = useApi('/api/admin/rooms');
