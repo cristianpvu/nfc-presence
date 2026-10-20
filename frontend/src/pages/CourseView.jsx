@@ -125,6 +125,7 @@ export default function CourseView() {
               <tr>
                 <th>#</th>
                 <th>Nume complet</th>
+                <th>ID student</th>
                 <th>Banca</th>
                 <th>Ora</th>
                 {admin && <th />}
@@ -135,6 +136,7 @@ export default function CourseView() {
                 <tr key={item._id}>
                   <td>{firstIndex + index + 1}</td>
                   <td>{item.studentName}</td>
+                  <td>{item.studentId || '—'}</td>
                   <td>{deskLabels.get(item.desk)}</td>
                   <td>{formatTime(item.createdAt)}</td>
                   {admin && (

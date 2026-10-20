@@ -62,6 +62,7 @@ export default function SeatMap({ desks, occupants }) {
     popover = (
       <div ref={popoverRef} className={`seat-popover ${below ? 'below' : 'above'} ${align}`} style={style} role="tooltip">
         <div className="seat-popover-name">{selected.studentName}</div>
+        {selected.studentId && <div className="seat-popover-id">{selected.studentId}</div>}
         <div className="seat-popover-time">{formatTime(selected.createdAt)}</div>
       </div>
     );

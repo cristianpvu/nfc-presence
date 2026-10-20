@@ -992,6 +992,11 @@ select.form-control {
   overflow-wrap: anywhere;
 }
 
+.seat-popover-id {
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
 .seat-popover-time {
   font-size: 0.8125rem;
   color: var(--muted);

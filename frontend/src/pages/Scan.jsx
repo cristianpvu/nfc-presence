@@ -7,11 +7,6 @@ import logo from '../assets/ase-logo.png';
 const TAP_AGAIN = 'Atinge eticheta NFC de pe banca ta.';
 const normalize = value => value.trim().replace(/\s+/g, ' ');
 
-function previewScan() {
-  const startsAt = new Date();
-  return { token: null, course: { name: 'Curs demonstrativ', startsAt, endsAt: new Date(startsAt.getTime() + 2 * 60 * 60 * 1000) } };
-}
-
 function readScanParams() {
   const query = new URLSearchParams(window.location.search);
   const params = Object.fromEntries(['picc', 'uid', 'ctr', 'cmac'].map(key => [key, query.get(key)]).filter(([, value]) => value));
@@ -30,12 +25,6 @@ export default function Scan() {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-
-    if (new URLSearchParams(window.location.search).has('preview')) {
-      window.history.replaceState(null, '', window.location.pathname + '?preview');
-      setState({ step: 'form', scan: previewScan(), preview: true });
-      return;
-    }
 
     const params = readScanParams();
     if (!params) {
@@ -58,10 +47,6 @@ export default function Scan() {
     }
     if (!studentId) {
       setFormError('Introdu ID-ul de student.');
-      return;
-    }
-    if (state.preview) {
-      setState({ step: 'done', scan: state.scan, studentName, preview: true });
       return;
     }
 

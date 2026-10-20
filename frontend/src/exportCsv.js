@@ -12,8 +12,8 @@ const csvField = value => `"${String(value).replace(/"/g, '""')}"`;
 
 export function exportAttendance(course, attendances, deskLabels) {
   const rows = [
-    ['Nume complet', 'Banca', 'Ora'],
-    ...attendances.map(item => [item.studentName, deskLabels.get(item.desk) ?? '', formatTime(item.createdAt)]),
+    ['Nume complet', 'ID student', 'Banca', 'Ora'],
+    ...attendances.map(item => [item.studentName, item.studentId ?? '', deskLabels.get(item.desk) ?? '', formatTime(item.createdAt)]),
   ];
   const csv = '\uFEFF' + rows.map(row => row.map(csvField).join(',')).join('\r\n');
 
