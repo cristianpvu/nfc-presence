@@ -9,7 +9,8 @@ const Attendance = require('../models/Attendance');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { describeLayout, isValidLayout, syncDesks } = require('../layout');
 const { bucharestTime, isDay, isTime } = require('../time');
-const { NOT_FOUND } = require('../messages');
+const { isValidPassword } = require('../validation');
+const { NOT_FOUND, INVALID_PASSWORD } = require('../messages');
 
 const router = express.Router();
 
@@ -33,9 +34,7 @@ async function saveUser(req, res, user) {
   if (!name) return fail(res, 400, 'Introdu numele complet.');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res, 400, 'Introdu un email valid.');
   if (!ROLES.includes(role)) return fail(res, 400, 'Rol invalid.');
-  if (password !== undefined && password !== '' && (typeof password !== 'string' || password.length < 6)) {
-    return fail(res, 400, 'Parola trebuie să aibă cel puțin 6 caractere.');
-  }
+  if (password !== undefined && password !== '' && !isValidPassword(password)) return fail(res, 400, INVALID_PASSWORD);
   if (user.isNew && !password) return fail(res, 400, 'Introdu o parolă.');
   if (String(user._id) === req.user.id && role !== 'admin') {
     return fail(res, 400, 'Nu îți poți elimina propriul rol de administrator.');

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { clearSession, getSession, isAdmin } from '../session';
 import Icon from './Icon';
+import ChangePasswordModal from './ChangePasswordModal';
 import logo from '../assets/ase-logo.png';
 
 const SIDEBAR_KEY = 'sidebar';
@@ -27,6 +28,7 @@ export default function Layout({ children }) {
   const user = getSession()?.user;
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem(SIDEBAR_KEY) !== 'expanded');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
   const userRef = useRef(null);
 
   useEffect(() => {
@@ -41,6 +43,11 @@ export default function Layout({ children }) {
   function toggle() {
     setCollapsed(!collapsed);
     localStorage.setItem(SIDEBAR_KEY, collapsed ? 'expanded' : 'collapsed');
+  }
+
+  function openChangePassword() {
+    setMenuOpen(false);
+    setChangingPassword(true);
   }
 
   function logout() {
@@ -90,6 +97,10 @@ export default function Layout({ children }) {
                   <Icon name="logout" />
                   Ieșire
                 </button>
+                <button type="button" className="user-menu-item" onClick={openChangePassword}>
+                  <Icon name="key" />
+                  Schimbare parolă
+                </button>
               </div>
             )}
           </div>
@@ -101,6 +112,8 @@ export default function Layout({ children }) {
       </aside>
 
       <main className="page">{children}</main>
+
+      {changingPassword && <ChangePasswordModal onClose={() => setChangingPassword(false)} />}
     </div>
   );
 }

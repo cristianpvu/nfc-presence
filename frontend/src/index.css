@@ -263,6 +263,73 @@ h1, h2, h3 {
   background: #f1f3f5;
 }
 
+.user-menu-item + .user-menu-item {
+  margin-top: 0;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(29, 33, 37, 0.45);
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+  font-size: 1.125rem;
+}
+
+.modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  color: var(--text);
+  background: #f1f3f5;
+}
+
+.modal-close .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.modal-body {
+  padding: 1.25rem;
+}
+
+.modal-body .field + .field {
+  margin-top: 1rem;
+}
+
 .sidebar-toggle {
   position: absolute;
   top: 50%;
@@ -760,11 +827,11 @@ select.form-control {
   margin-top: 1.25rem;
 }
 
-.form-alert {
+.alert.form-alert {
   margin: 0 0 1rem;
 }
 
-.page-alert {
+.alert.page-alert {
   margin: 0 0 1rem;
 }
 

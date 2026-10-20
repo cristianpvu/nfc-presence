@@ -13,4 +13,6 @@ module.exports = {
   INVALID_LOGIN: 'Email sau parolă incorectă.',
   SESSION_EXPIRED: 'Sesiunea a expirat. Autentifică-te din nou.',
   FORBIDDEN: 'Nu ai acces la această pagină.',
+  INVALID_PASSWORD: 'Parola trebuie să aibă cel puțin 6 caractere.',
+  WRONG_PASSWORD: 'Parola curentă este incorectă.',
 };

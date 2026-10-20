@@ -5,6 +5,7 @@ import Layout from '../../components/Layout';
 import FormCard, { Field } from '../../components/FormCard';
 import IconButton from '../../components/IconButton';
 import Icon from '../../components/Icon';
+import { MIN_PASSWORD_LENGTH, PASSWORD_ERROR } from '../../password';
 
 const ROLE_LABELS = { professor: 'Profesor', admin: 'Administrator' };
 const EMPTY = { name: '', email: '', role: 'professor', password: '' };
@@ -26,6 +27,9 @@ export default function AdminUsers() {
   }
 
   async function save() {
+    if (!editing._id && !form.password) return setFormError('Introdu o parolă.');
+    if (form.password && form.password.length < MIN_PASSWORD_LENGTH) return setFormError(PASSWORD_ERROR);
+
     setSaving(true);
     setFormError('');
     try {
@@ -92,7 +96,7 @@ export default function AdminUsers() {
               type="password"
               value={form.password}
               onChange={update('password')}
-              placeholder={editing._id ? 'Lasă gol pentru a o păstra' : ''}
+              placeholder={editing._id ? 'Lasă gol pentru a o păstra' : `Minim ${MIN_PASSWORD_LENGTH} caractere`}
               autoComplete="new-password"
             />
           </Field>
