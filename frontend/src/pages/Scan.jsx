@@ -5,6 +5,12 @@ import { formatInterval } from '../format';
 import logo from '../assets/ase-logo.png';
 
 const TAP_AGAIN = 'Atinge eticheta NFC de pe banca ta.';
+const normalize = value => value.trim().replace(/\s+/g, ' ');
+
+function previewScan() {
+  const startsAt = new Date();
+  return { token: null, course: { name: 'Curs demonstrativ', startsAt, endsAt: new Date(startsAt.getTime() + 2 * 60 * 60 * 1000) } };
+}
 
 function readScanParams() {
   const query = new URLSearchParams(window.location.search);
@@ -17,12 +23,19 @@ export default function Scan() {
   const started = useRef(false);
   const [state, setState] = useState({ step: 'loading' });
   const [name, setName] = useState('');
+  const [studentIdValue, setStudentIdValue] = useState('');
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (started.current) return;
     started.current = true;
+
+    if (new URLSearchParams(window.location.search).has('preview')) {
+      window.history.replaceState(null, '', window.location.pathname + '?preview');
+      setState({ step: 'form', scan: previewScan(), preview: true });
+      return;
+    }
 
     const params = readScanParams();
     if (!params) {
@@ -37,9 +50,18 @@ export default function Scan() {
 
   async function submit(event) {
     event.preventDefault();
-    const studentName = name.trim().replace(/\s+/g, ' ');
+    const studentName = normalize(name);
+    const studentId = normalize(studentIdValue);
     if (studentName.length < 3) {
       setFormError('Introdu numele complet.');
+      return;
+    }
+    if (!studentId) {
+      setFormError('Introdu ID-ul de student.');
+      return;
+    }
+    if (state.preview) {
+      setState({ step: 'done', scan: state.scan, studentName, preview: true });
       return;
     }
 
@@ -48,7 +70,7 @@ export default function Scan() {
     try {
       await api('/api/attendance', {
         method: 'POST',
-        body: { token: state.scan.token, studentName, deviceId: getDeviceId() },
+        body: { token: state.scan.token, studentName, studentId, deviceId: getDeviceId() },
       });
       setState({ step: 'done', scan: state.scan, studentName });
     } catch (err) {
@@ -84,6 +106,15 @@ export default function Scan() {
               autoComplete="name"
               maxLength={100}
               autoFocus
+            />
+            <label className="form-label" htmlFor="studentId">ID student</label>
+            <input
+              id="studentId"
+              className="form-control"
+              value={studentIdValue}
+              onChange={event => setStudentIdValue(event.target.value)}
+              autoComplete="off"
+              maxLength={50}
             />
             {formError && <div className="form-error">{formError}</div>}
             <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>

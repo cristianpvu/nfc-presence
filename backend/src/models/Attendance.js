@@ -5,6 +5,7 @@ const attendanceSchema = new Schema(
     course: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
     desk: { type: Schema.Types.ObjectId, ref: 'Desk', required: true },
     studentName: { type: String, required: true, trim: true },
+    studentId: { type: String, required: true, trim: true },
     deviceId: { type: String, required: true },
   },
   { timestamps: { createdAt: true, updatedAt: false } }

@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
 
   const [desks, attendances] = await Promise.all([
     Desk.find({ room: course.room._id }).sort({ row: 1, col: 1 }).select('label row col'),
-    Attendance.find({ course: course._id }).sort({ createdAt: 1 }).select('desk studentName createdAt'),
+    Attendance.find({ course: course._id }).sort({ createdAt: 1 }).select('desk studentName studentId createdAt'),
   ]);
 
   res.json({ course, desks, attendances });
