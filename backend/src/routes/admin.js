@@ -6,6 +6,7 @@ const Room = require('../models/Room');
 const Desk = require('../models/Desk');
 const Course = require('../models/Course');
 const Attendance = require('../models/Attendance');
+const ManualAttendance = require('../models/ManualAttendance');
 const ScanLog = require('../models/ScanLog');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { parseLayout, buildDesks, describeLayout, summarizeLayout, syncDesks } = require('../layout');
@@ -189,12 +190,12 @@ router.put('/courses/:id', async (req, res) => {
 router.delete('/courses/:id', async (req, res) => {
   const deleted = await Course.findByIdAndDelete(req.params.id);
   if (!deleted) return fail(res, 404, NOT_FOUND);
-  await Attendance.deleteMany({ course: deleted._id });
+  await Promise.all([Attendance.deleteMany({ course: deleted._id }), ManualAttendance.deleteMany({ course: deleted._id })]);
   res.status(204).end();
 });
 
 router.delete('/attendances/:id', async (req, res) => {
-  const deleted = await Attendance.findByIdAndDelete(req.params.id);
+  const deleted = (await Attendance.findByIdAndDelete(req.params.id)) ?? (await ManualAttendance.findByIdAndDelete(req.params.id));
   if (!deleted) return fail(res, 404, NOT_FOUND);
   req.app.get('io').to(`course:${deleted.course}`).emit('attendance-removed', { _id: deleted._id });
   res.status(204).end();

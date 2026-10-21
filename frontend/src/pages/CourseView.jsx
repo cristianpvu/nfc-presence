@@ -8,6 +8,7 @@ import Icon from '../components/Icon';
 import IconButton from '../components/IconButton';
 import Pagination from '../components/Pagination';
 import SeatMap from '../components/SeatMap';
+import AddAttendanceModal from '../components/AddAttendanceModal';
 import { formatDate, formatInterval, formatTime } from '../format';
 import { exportAttendance } from '../exportCsv';
 import { searchable } from '../names';
@@ -22,8 +23,16 @@ export default function CourseView() {
   const [search, setSearch] = useState('');
   const [selection, setSelection] = useState(null);
   const [flipped, setFlipped] = useState(false);
+  const [adding, setAdding] = useState(false);
   const mapRef = useRef(null);
   const selectFromMap = useCallback(deskId => setSelection(deskId && { deskId, fromList: false }), []);
+  const addAttendance = useCallback(entry => {
+    setData(current => {
+      if (!current || current.attendances.some(item => item._id === entry._id)) return current;
+      return { ...current, attendances: [...current.attendances, entry] };
+    });
+  }, []);
+  const closeAddModal = useCallback(() => setAdding(false), []);
 
   useEffect(() => {
     let active = true;
@@ -39,21 +48,16 @@ export default function CourseView() {
     socket.on('attendance-removed', ({ _id }) => {
       setData(current => current && { ...current, attendances: current.attendances.filter(item => item._id !== _id) });
     });
-    socket.on('attendance', entry => {
-      setData(current => {
-        if (!current || current.attendances.some(item => item._id === entry._id)) return current;
-        return { ...current, attendances: [...current.attendances, entry] };
-      });
-    });
+    socket.on('attendance', addAttendance);
 
     return () => {
       active = false;
       socket.disconnect();
     };
-  }, [id]);
+  }, [id, addAttendance]);
 
   const occupants = useMemo(
-    () => new Map(data?.attendances.map(item => [item.desk, item])),
+    () => new Map(data?.attendances.filter(item => item.desk).map(item => [item.desk, item])),
     [data]
   );
 
@@ -84,6 +88,7 @@ export default function CourseView() {
   }
 
   function showOnMap(item) {
+    if (!item.desk) return;
     setSelection({ deskId: item.desk, fromList: true });
     mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
@@ -148,7 +153,7 @@ export default function CourseView() {
             >
               <Icon name="flip" />
             </button>
-            <p className="occupancy muted">{attendances.length} din {desks.length} locuri ocupate</p>
+            <p className="occupancy muted">{occupants.size} din {desks.length} locuri ocupate</p>
           </div>
         </div>
       </section>
@@ -156,12 +161,15 @@ export default function CourseView() {
       <section className="card">
         <div className="card-header">
           <h3>Studenți prezenți</h3>
-          {attendances.length > 0 && (
-            <label className="search">
-              <Icon name="search" />
-              <input className="form-control" type="search" value={search} onChange={updateSearch} placeholder="Caută" aria-label="Caută" />
-            </label>
-          )}
+          <div className="card-actions">
+            <IconButton icon="plus" label="Adaugă prezență" onClick={() => setAdding(true)} />
+            {attendances.length > 0 && (
+              <label className="search">
+                <Icon name="search" />
+                <input className="form-control" type="search" value={search} onChange={updateSearch} placeholder="Caută" aria-label="Caută" />
+              </label>
+            )}
+          </div>
         </div>
         {attendances.length === 0 && <p className="card-body muted">Niciun student nu și-a înregistrat încă prezența.</p>}
         {attendances.length > 0 && rows.length === 0 && <p className="card-body muted">Niciun student găsit.</p>}
@@ -189,7 +197,7 @@ export default function CourseView() {
                   <td>{number}</td>
                   <td>{item.studentName}</td>
                   <td>{item.studentId || '—'}</td>
-                  <td>{deskLabels.get(item.desk)}</td>
+                  <td>{deskLabels.get(item.desk) ?? '—'}</td>
                   <td>{formatTime(item.createdAt)}</td>
                   {admin && (
                     <td className="table-actions" onClick={event => event.stopPropagation()}>
@@ -204,6 +212,8 @@ export default function CourseView() {
       </section>
 
       <Pagination page={currentPage} pageCount={pageCount} onChange={setPage} />
+
+      {adding && <AddAttendanceModal courseId={course._id} onAdded={addAttendance} onClose={closeAddModal} />}
     </Layout>
   );
 }
