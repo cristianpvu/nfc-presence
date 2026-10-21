@@ -21,6 +21,7 @@ export default function CourseView() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [selection, setSelection] = useState(null);
+  const [flipped, setFlipped] = useState(false);
   const mapRef = useRef(null);
   const selectFromMap = useCallback(deskId => setSelection(deskId && { deskId, fromList: false }), []);
 
@@ -134,8 +135,21 @@ export default function CourseView() {
             selectedId={selection?.deskId}
             highlighted={selection?.fromList}
             onSelect={selectFromMap}
+            flipped={flipped}
           />
-          <p className="occupancy muted">{attendances.length} din {desks.length} locuri ocupate</p>
+          <div className="map-footer">
+            <button
+              type="button"
+              className="map-flip"
+              onClick={() => setFlipped(!flipped)}
+              title={flipped ? 'Catedra jos' : 'Catedra sus'}
+              aria-label={flipped ? 'Catedra jos' : 'Catedra sus'}
+              aria-pressed={flipped}
+            >
+              <Icon name="flip" />
+            </button>
+            <p className="occupancy muted">{attendances.length} din {desks.length} locuri ocupate</p>
+          </div>
         </div>
       </section>
 

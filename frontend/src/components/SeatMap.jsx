@@ -15,16 +15,17 @@ const MIN_NAME_SCALE = 0.8;
 const deskX = desk => desk.x ?? desk.col;
 const deskY = desk => desk.y ?? desk.row;
 
-export default function SeatMap({ desks, occupants, selectedId, highlighted, onSelect }) {
+export default function SeatMap({ desks, occupants, selectedId, highlighted, onSelect, flipped = false }) {
   const [scale, setScale] = useState(1);
   const popoverRef = useRef(null);
   const wrapRef = useRef(null);
 
   const cols = Math.max(1, ...desks.map(deskX));
   const rows = Math.max(1, ...desks.map(deskY));
-  const boardTop = PADDING + rows * DESK_HEIGHT + (rows - 1) * GAP + GAP * 3;
+  const boardTop = flipped ? PADDING : PADDING + rows * DESK_HEIGHT + (rows - 1) * GAP + GAP * 3;
+  const desksTop = flipped ? PADDING + BOARD_HEIGHT + GAP * 3 : PADDING;
   const width = PADDING * 2 + cols * DESK_WIDTH + (cols - 1) * GAP;
-  const height = boardTop + BOARD_HEIGHT + PADDING;
+  const height = PADDING * 2 + BOARD_HEIGHT + GAP * 3 + rows * DESK_HEIGHT + (rows - 1) * GAP;
 
   useEffect(() => {
     if (!wrapRef.current) return;
@@ -54,8 +55,8 @@ export default function SeatMap({ desks, occupants, selectedId, highlighted, onS
   const nameFont = `700 ${NAME_FONT_SIZE}px ${getComputedStyle(document.body).fontFamily}`;
 
   const position = desk => ({
-    x: PADDING + (deskX(desk) - 1) * (DESK_WIDTH + GAP),
-    y: PADDING + (rows - deskY(desk)) * (DESK_HEIGHT + GAP),
+    x: PADDING + (flipped ? cols - deskX(desk) : deskX(desk) - 1) * (DESK_WIDTH + GAP),
+    y: desksTop + (flipped ? deskY(desk) - 1 : rows - deskY(desk)) * (DESK_HEIGHT + GAP),
   });
 
   const toggle = desk => onSelect(selectedId === desk._id ? null : desk._id);
@@ -84,7 +85,7 @@ export default function SeatMap({ desks, occupants, selectedId, highlighted, onS
   let popover = null;
   if (selected) {
     const { x, y } = position(selectedDesk);
-    const below = deskY(selectedDesk) === rows;
+    const below = deskY(selectedDesk) === (flipped ? 1 : rows);
     const style = { top: `${((below ? y + DESK_HEIGHT : y) / height) * 100}%` };
     const center = (x + DESK_WIDTH / 2) / width;
     let align = 'center';

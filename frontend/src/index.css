@@ -668,6 +668,38 @@ h1, h2, h3 {
   font-size: 0.875rem;
 }
 
+.map-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+}
+
+.map-footer .occupancy {
+  margin: 0;
+}
+
+.map-flip {
+  display: flex;
+  align-items: center;
+  padding: 0.125rem;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.map-flip:hover,
+.map-flip[aria-pressed='true'] {
+  color: var(--primary);
+}
+
+.map-flip .icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
 .btn {
   display: inline-block;
   padding: 0.375rem 0.75rem;
