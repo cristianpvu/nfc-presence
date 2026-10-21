@@ -41,7 +41,7 @@ export default function AddAttendanceModal({ courseId, onAdded, onClose }) {
           />
         </label>
         <label className="field">
-          <span className="field-label">ID student (opțional)</span>
+          <span className="field-label">ID student</span>
           <input
             className="form-control"
             value={form.studentId}

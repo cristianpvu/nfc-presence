@@ -29,7 +29,7 @@ export default function CourseView() {
   const addAttendance = useCallback(entry => {
     setData(current => {
       if (!current || current.attendances.some(item => item._id === entry._id)) return current;
-      return { ...current, attendances: [...current.attendances, entry] };
+      return { ...current, attendances: [entry, ...current.attendances] };
     });
   }, []);
   const closeAddModal = useCallback(() => setAdding(false), []);
@@ -100,7 +100,7 @@ export default function CourseView() {
 
   const query = searchable(search.trim());
   const rows = attendances
-    .map((item, index) => ({ item, number: index + 1 }))
+    .map((item, index) => ({ item, number: attendances.length - index }))
     .filter(({ item }) => !query || searchable(item.studentName).includes(query) || searchable(item.studentId).includes(query));
   const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);

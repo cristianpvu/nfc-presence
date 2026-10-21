@@ -32,7 +32,7 @@ router.get('/:id', async (req, res) => {
     Attendance.find({ course: course._id }).select('desk studentName studentId createdAt'),
     ManualAttendance.find({ course: course._id }).select('studentName studentId createdAt'),
   ]);
-  const attendances = [...scanned, ...manual].sort((a, b) => a.createdAt - b.createdAt);
+  const attendances = [...scanned, ...manual].sort((a, b) => b.createdAt - a.createdAt);
 
   res.json({ course, desks, attendances });
 });

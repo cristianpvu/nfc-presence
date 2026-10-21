@@ -1119,6 +1119,13 @@ select.form-control {
   gap: 0.5rem;
 }
 
+.card-actions .btn-icon {
+  width: calc(0.875rem * 1.5 + 0.5rem + 2px);
+  height: calc(0.875rem * 1.5 + 0.5rem + 2px);
+  border-color: #8f959e;
+  border-radius: 0.5rem;
+}
+
 .search {
   position: relative;
   display: flex;
