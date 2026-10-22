@@ -330,6 +330,13 @@ h1, h2, h3 {
   margin-top: 1rem;
 }
 
+.course-popover {
+  position: fixed;
+  z-index: 100;
+  width: min(320px, calc(100vw - 24px));
+  border: 1px solid var(--border);
+}
+
 .course-details {
   display: grid;
   gap: 0.625rem;

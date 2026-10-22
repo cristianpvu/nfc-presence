@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import CourseDetailsModal from './CourseDetailsModal';
+import CourseDetailsPopover from './CourseDetailsPopover';
 import Icon from './Icon';
 import { dayKey, formatMonth, formatTime, isLive } from '../format';
 
@@ -67,7 +67,7 @@ export default function CourseCalendar({ courses }) {
               <button
                 type="button"
                 key={course._id}
-                onClick={() => setSelected(course)}
+                onClick={event => setSelected(selected?.course === course ? null : { course, anchor: event.currentTarget })}
                 className={isLive(course) ? 'calendar-event live' : 'calendar-event'}
                 title={`${formatTime(course.startsAt)} – ${formatTime(course.endsAt)} · ${course.name} · ${course.room.name}`}
               >
@@ -78,7 +78,7 @@ export default function CourseCalendar({ courses }) {
         ))}
       </div>
 
-      {selected && <CourseDetailsModal course={selected} onClose={closeDetails} />}
+      {selected && <CourseDetailsPopover course={selected.course} anchor={selected.anchor} onClose={closeDetails} />}
     </div>
   );
 }
