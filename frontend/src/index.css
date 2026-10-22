@@ -358,23 +358,18 @@ h1, h2, h3 {
   color: var(--muted);
 }
 
-.live-badge {
-  display: inline-block;
-  margin-bottom: 1rem;
-  padding: 0.125rem 0.625rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #2e7d32;
-  background: #e3f2e4;
-  border-radius: 999px;
+.course-popover .modal-header {
+  gap: 0.5rem;
 }
 
-a.btn:hover {
-  text-decoration: none;
+.course-popover-actions {
+  display: flex;
+  flex-shrink: 0;
 }
 
-a.btn-primary:hover {
-  color: #fff;
+.course-popover-open,
+.course-popover-open:hover {
+  color: var(--primary);
 }
 
 .sidebar-toggle {

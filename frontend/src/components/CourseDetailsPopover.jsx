@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from './Icon';
-import { formatDate, formatInterval, isLive } from '../format';
+import { formatDate, formatInterval } from '../format';
 
 const GAP = 8;
 const MARGIN = 12;
@@ -44,20 +44,21 @@ export default function CourseDetailsPopover({ course, anchor, onClose }) {
     <div ref={ref} className="modal course-popover" style={style} role="dialog" aria-label={course.name}>
       <div className="modal-header">
         <h3>{course.name}</h3>
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Închide">
-          <Icon name="close" />
-        </button>
+        <div className="course-popover-actions">
+          <Link to={`/courses/${course._id}`} className="modal-close course-popover-open" title="Deschide cursul" aria-label="Deschide cursul">
+            <Icon name="open" />
+          </Link>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Închide">
+            <Icon name="close" />
+          </button>
+        </div>
       </div>
       <div className="modal-body">
-        {isLive(course) && <span className="live-badge">În desfășurare</span>}
         <ul className="course-details">
           <li><Icon name="courses" />{formatDate(course.startsAt)}</li>
           <li><Icon name="clock" />{formatInterval(course)}</li>
           <li><Icon name="pin" />{course.room.name}</li>
         </ul>
-        <div className="form-actions">
-          <Link to={`/courses/${course._id}`} className="btn btn-primary">Deschide cursul</Link>
-        </div>
       </div>
     </div>
   );
