@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useCallback, useMemo, useState } from 'react';
+import CourseDetailsModal from './CourseDetailsModal';
 import Icon from './Icon';
 import { dayKey, formatMonth, formatTime, isLive } from '../format';
 
@@ -27,6 +27,8 @@ function buildWeeks(year, month) {
 
 export default function CourseCalendar({ courses }) {
   const [{ year, month }, setMonth] = useState(currentMonth);
+  const [selected, setSelected] = useState(null);
+  const closeDetails = useCallback(() => setSelected(null), []);
   const today = dayKey(Date.now());
 
   const coursesByDay = useMemo(() => {
@@ -62,18 +64,21 @@ export default function CourseCalendar({ courses }) {
           <div key={cell.key} className={cell.inMonth ? 'calendar-day' : 'calendar-day outside'}>
             <span className={cell.key === today ? 'calendar-date today' : 'calendar-date'}>{cell.day}</span>
             {coursesByDay.get(cell.key)?.map(course => (
-              <Link
+              <button
+                type="button"
                 key={course._id}
-                to={`/courses/${course._id}`}
+                onClick={() => setSelected(course)}
                 className={isLive(course) ? 'calendar-event live' : 'calendar-event'}
                 title={`${formatTime(course.startsAt)} – ${formatTime(course.endsAt)} · ${course.name} · ${course.room.name}`}
               >
                 <span className="calendar-time">{formatTime(course.startsAt)}</span> {course.name}
-              </Link>
+              </button>
             ))}
           </div>
         ))}
       </div>
+
+      {selected && <CourseDetailsModal course={selected} onClose={closeDetails} />}
     </div>
   );
 }

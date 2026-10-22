@@ -330,6 +330,46 @@ h1, h2, h3 {
   margin-top: 1rem;
 }
 
+.course-details {
+  display: grid;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.course-details li {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.course-details .icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+
+.live-badge {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #2e7d32;
+  background: #e3f2e4;
+  border-radius: 999px;
+}
+
+a.btn:hover {
+  text-decoration: none;
+}
+
+a.btn-primary:hover {
+  color: #fff;
+}
+
 .sidebar-toggle {
   position: absolute;
   top: 50%;
@@ -511,10 +551,16 @@ h1, h2, h3 {
 
 .calendar-event {
   display: block;
+  width: 100%;
   padding: 1px 6px;
   overflow: hidden;
+  font: inherit;
   font-size: 0.8125rem;
   color: var(--text);
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
   white-space: nowrap;
   text-overflow: ellipsis;
   border-radius: 4px;

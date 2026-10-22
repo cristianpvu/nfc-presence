@@ -38,26 +38,16 @@ export default function Courses() {
   const page = Number.isInteger(requested) && requested >= 1 && requested <= pageCount ? requested : defaultPage;
   const visible = courses?.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) ?? [];
 
-  const view = searchParams.get('view') === 'calendar' ? 'calendar' : 'list';
+  const view = searchParams.get('view') === 'list' ? 'list' : 'calendar';
 
-  const goTo = target => setSearchParams({ page: String(target) });
-  const showView = target => setSearchParams(target === 'calendar' ? { view: 'calendar' } : {});
+  const goTo = target => setSearchParams({ view: 'list', page: String(target) });
+  const showView = target => setSearchParams(target === 'list' ? { view: 'list' } : {});
 
   return (
     <Layout>
       <div className="page-header">
         <h2 className="page-title">Cursurile mele</h2>
         <div className="view-toggle" role="group" aria-label="Mod de afișare">
-          <button
-            type="button"
-            className={view === 'list' ? 'btn btn-outline btn-icon active' : 'btn btn-outline btn-icon'}
-            onClick={() => showView('list')}
-            title="Listă"
-            aria-label="Listă"
-            aria-pressed={view === 'list'}
-          >
-            <Icon name="list" />
-          </button>
           <button
             type="button"
             className={view === 'calendar' ? 'btn btn-outline btn-icon active' : 'btn btn-outline btn-icon'}
@@ -67,6 +57,16 @@ export default function Courses() {
             aria-pressed={view === 'calendar'}
           >
             <Icon name="courses" />
+          </button>
+          <button
+            type="button"
+            className={view === 'list' ? 'btn btn-outline btn-icon active' : 'btn btn-outline btn-icon'}
+            onClick={() => showView('list')}
+            title="Listă"
+            aria-label="Listă"
+            aria-pressed={view === 'list'}
+          >
+            <Icon name="list" />
           </button>
         </div>
       </div>
