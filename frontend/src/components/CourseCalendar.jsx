@@ -25,10 +25,15 @@ function buildWeeks(year, month) {
   }));
 }
 
-export default function CourseCalendar({ courses }) {
+export default function CourseCalendar({ courses, onEdit, onDelete }) {
   const [{ year, month }, setMonth] = useState(currentMonth);
   const [selected, setSelected] = useState(null);
   const closeDetails = useCallback(() => setSelected(null), []);
+  const withClose = action => action && (() => {
+    const { course } = selected;
+    setSelected(null);
+    action(course);
+  });
   const today = dayKey(Date.now());
 
   const coursesByDay = useMemo(() => {
@@ -78,7 +83,15 @@ export default function CourseCalendar({ courses }) {
         ))}
       </div>
 
-      {selected && <CourseDetailsPopover course={selected.course} anchor={selected.anchor} onClose={closeDetails} />}
+      {selected && (
+        <CourseDetailsPopover
+          course={selected.course}
+          anchor={selected.anchor}
+          onClose={closeDetails}
+          onEdit={withClose(onEdit)}
+          onDelete={withClose(onDelete)}
+        />
+      )}
     </div>
   );
 }

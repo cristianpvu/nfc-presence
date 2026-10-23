@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from './Icon';
+import { isAdmin } from '../session';
 import { formatDate, formatInterval } from '../format';
 
 const GAP = 8;
 const MARGIN = 12;
 
-export default function CourseDetailsPopover({ course, anchor, onClose }) {
+export default function CourseDetailsPopover({ course, anchor, onClose, onEdit, onDelete }) {
   const ref = useRef(null);
   const [style, setStyle] = useState({ visibility: 'hidden' });
 
@@ -57,8 +58,21 @@ export default function CourseDetailsPopover({ course, anchor, onClose }) {
         <ul className="course-details">
           <li><Icon name="courses" />{formatDate(course.startsAt)}</li>
           <li><Icon name="clock" />{formatInterval(course)}</li>
-          <li><Icon name="pin" />{course.room.name}</li>
+          <li>
+            <Icon name="pin" />
+            {isAdmin() ? <Link to={`/admin/rooms/${course.room._id}`}>{course.room.name}</Link> : course.room.name}
+          </li>
         </ul>
+        {onEdit && onDelete && (
+          <div className="course-popover-tools">
+            <button type="button" className="modal-close" onClick={onEdit} title="Editează" aria-label="Editează">
+              <Icon name="edit" />
+            </button>
+            <button type="button" className="modal-close course-popover-delete" onClick={onDelete} title="Șterge" aria-label="Șterge">
+              <Icon name="trash" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

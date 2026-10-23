@@ -1,22 +1,21 @@
-import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import { api } from '../../api';
 import useApi from '../../useApi';
 import Layout from '../../components/Layout';
-import Pagination from '../../components/Pagination';
+import CourseCalendar from '../../components/CourseCalendar';
+import SearchSelect from '../../components/SearchSelect';
 import FormCard, { Field } from '../../components/FormCard';
-import IconButton from '../../components/IconButton';
 import Icon from '../../components/Icon';
-import { dayKey, formatDate, formatInterval, formatTime, hasEnded, isLive } from '../../format';
+import { dayKey, formatDate, formatTime } from '../../format';
 
-const PAGE_SIZE = 15;
 const EMPTY = { name: '', room: '', professor: '', date: '', start: '', end: '' };
 
 export default function AdminCourses() {
   const { data: courses, error: loadError, reload } = useApi('/api/admin/courses');
   const { data: rooms } = useApi('/api/admin/rooms');
   const { data: users } = useApi('/api/admin/users');
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [professorFilter, setProfessorFilter] = useState('');
+  const [roomFilter, setRoomFilter] = useState('');
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [formError, setFormError] = useState('');
@@ -26,12 +25,10 @@ export default function AdminCourses() {
   const professors = users?.filter(user => user.role === 'professor') ?? [];
   const update = field => event => setForm({ ...form, [field]: event.target.value });
 
-  const pageCount = Math.max(1, Math.ceil((courses?.length ?? 0) / PAGE_SIZE));
-  const firstCurrent = courses ? courses.findIndex(course => !hasEnded(course)) : -1;
-  const defaultPage = firstCurrent === -1 ? pageCount : Math.floor(firstCurrent / PAGE_SIZE) + 1;
-  const requested = Number(searchParams.get('page'));
-  const page = Number.isInteger(requested) && requested >= 1 && requested <= pageCount ? requested : defaultPage;
-  const visible = courses?.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) ?? [];
+  const filtered = useMemo(
+    () => courses?.filter(course => (!professorFilter || course.professor._id === professorFilter) && (!roomFilter || course.room._id === roomFilter)),
+    [courses, professorFilter, roomFilter]
+  );
 
   function open(course) {
     setEditing(course);
@@ -46,6 +43,7 @@ export default function AdminCourses() {
       }
       : EMPTY);
     setFormError('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function save() {
@@ -81,10 +79,28 @@ export default function AdminCourses() {
     <Layout>
       <div className="page-header">
         <h2 className="page-title">Cursuri</h2>
-        <button type="button" className="btn btn-primary btn-with-icon" onClick={() => open({})}>
-          <Icon name="plus" />
-          Adaugă
-        </button>
+        <div className="course-filters">
+          <SearchSelect
+            items={professors}
+            getLabel={user => user.name}
+            placeholder="Toți profesorii"
+            label="Profesor"
+            emptyText="Niciun profesor găsit."
+            onSelect={setProfessorFilter}
+          />
+          <SearchSelect
+            items={rooms}
+            getLabel={room => room.name}
+            placeholder="Toate sălile"
+            label="Sala"
+            emptyText="Nicio sală găsită."
+            onSelect={setRoomFilter}
+          />
+          <button type="button" className="btn btn-primary btn-with-icon" onClick={() => open({})}>
+            <Icon name="plus" />
+            Adaugă
+          </button>
+        </div>
       </div>
 
       {(error || loadError) && <div className="alert alert-danger page-alert">{error || loadError}</div>}
@@ -124,43 +140,7 @@ export default function AdminCourses() {
         </FormCard>
       )}
 
-      {courses?.length === 0 && <p className="muted">Nu există cursuri.</p>}
-
-      {courses?.length > 0 && (
-        <>
-          <div className="card">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Curs</th>
-                  <th>Data</th>
-                  <th>Interval</th>
-                  <th>Sala</th>
-                  <th>Profesor</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {visible.map(course => (
-                  <tr key={course._id} className={isLive(course) ? 'row-live' : undefined}>
-                    <td><Link to={`/courses/${course._id}`}>{course.name}</Link></td>
-                    <td>{formatDate(course.startsAt)}</td>
-                    <td>{formatInterval(course)}</td>
-                    <td>{course.room?.name}</td>
-                    <td>{course.professor?.name}</td>
-                    <td className="table-actions">
-                      <IconButton icon="edit" label="Editează" onClick={() => open(course)} />
-                      <IconButton icon="trash" label="Șterge" onClick={() => remove(course)} danger />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <Pagination page={page} pageCount={pageCount} onChange={target => setSearchParams({ page: String(target) })} />
-        </>
-      )}
+      {filtered && <CourseCalendar courses={filtered} onEdit={open} onDelete={remove} />}
     </Layout>
   );
 }
