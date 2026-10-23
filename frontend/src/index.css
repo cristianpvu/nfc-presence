@@ -452,20 +452,7 @@ h1, h2, h3 {
   color: var(--primary);
 }
 
-.course-popover .modal-body {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding-right: 0.75rem;
-}
-
-.course-popover-tools {
-  display: flex;
-  flex-shrink: 0;
-  margin-top: -0.625rem;
-}
-
+.course-popover-delete,
 .course-popover-delete:hover {
   color: var(--danger);
 }
@@ -550,6 +537,10 @@ h1, h2, h3 {
 
 .course-filters .search-select {
   width: 200px;
+}
+
+.course-filters .btn {
+  flex-shrink: 0;
 }
 
 .course-filters .search .form-control {
@@ -1292,6 +1283,7 @@ select.form-control {
 }
 
 .search .form-control::-webkit-search-cancel-button {
+  margin-left: 0.5rem;
   cursor: pointer;
 }
 

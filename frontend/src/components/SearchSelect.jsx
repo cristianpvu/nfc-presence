@@ -6,8 +6,8 @@ const MAX_SUGGESTIONS = 8;
 
 const matches = (text, words) => words.every(word => text.includes(word));
 
-export default function SearchSelect({ items, getLabel, placeholder, label, emptyText, onSelect }) {
-  const [query, setQuery] = useState('');
+export default function SearchSelect({ items, getLabel, placeholder, label, emptyText, onSelect, initialQuery = '' }) {
+  const [query, setQuery] = useState(initialQuery);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const wrapRef = useRef(null);

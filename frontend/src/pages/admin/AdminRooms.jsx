@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { api } from '../../api';
 import useApi from '../../useApi';
 import Layout from '../../components/Layout';
@@ -7,11 +7,14 @@ import FormCard, { Field } from '../../components/FormCard';
 import IconButton from '../../components/IconButton';
 import Icon from '../../components/Icon';
 import LayoutPreview from '../../components/LayoutPreview';
+import SearchSelect from '../../components/SearchSelect';
 
 const EMPTY = { name: '', layout: '5 x 4 4\n-\n4 4' };
 
 export default function AdminRooms() {
   const { data: rooms, error: loadError, reload } = useApi('/api/admin/rooms');
+  const initialRoom = useLocation().state?.room;
+  const [roomFilter, setRoomFilter] = useState(initialRoom?._id ?? '');
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [formError, setFormError] = useState('');
@@ -59,10 +62,21 @@ export default function AdminRooms() {
     <Layout>
       <div className="page-header">
         <h2 className="page-title">Săli</h2>
-        <button type="button" className="btn btn-primary btn-with-icon" onClick={() => open({})}>
-          <Icon name="plus" />
-          Adaugă
-        </button>
+        <div className="course-filters">
+          <SearchSelect
+            items={rooms}
+            getLabel={room => room.name}
+            placeholder="Toate sălile"
+            label="Sala"
+            emptyText="Nicio sală găsită."
+            onSelect={setRoomFilter}
+            initialQuery={initialRoom?.name}
+          />
+          <button type="button" className="btn btn-primary btn-with-icon" onClick={() => open({})}>
+            <Icon name="plus" />
+            Adaugă
+          </button>
+        </div>
       </div>
 
       {(error || loadError) && <div className="alert alert-danger page-alert">{error || loadError}</div>}
@@ -100,7 +114,7 @@ export default function AdminRooms() {
               </tr>
             </thead>
             <tbody>
-              {rooms.map(room => (
+              {rooms.filter(room => !roomFilter || room._id === roomFilter).map(room => (
                 <tr key={room._id}>
                   <td><Link to={`/admin/rooms/${room._id}`}>{room.name}</Link></td>
                   <td>

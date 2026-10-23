@@ -49,6 +49,16 @@ export default function CourseDetailsPopover({ course, anchor, onClose, onEdit, 
           <Link to={`/courses/${course._id}`} className="modal-close course-popover-open" title="Deschide cursul" aria-label="Deschide cursul">
             <Icon name="open" />
           </Link>
+          {onEdit && onDelete && (
+            <>
+              <button type="button" className="modal-close" onClick={onEdit} title="Editează" aria-label="Editează">
+                <Icon name="edit" />
+              </button>
+              <button type="button" className="modal-close course-popover-delete" onClick={onDelete} title="Șterge" aria-label="Șterge">
+                <Icon name="trash" />
+              </button>
+            </>
+          )}
           <button type="button" className="modal-close" onClick={onClose} aria-label="Închide">
             <Icon name="close" />
           </button>
@@ -60,19 +70,9 @@ export default function CourseDetailsPopover({ course, anchor, onClose, onEdit, 
           <li><Icon name="clock" />{formatInterval(course)}</li>
           <li>
             <Icon name="pin" />
-            {isAdmin() ? <Link to={`/admin/rooms/${course.room._id}`}>{course.room.name}</Link> : course.room.name}
+            {isAdmin() ? <Link to="/admin/rooms" state={{ room: course.room }}>{course.room.name}</Link> : course.room.name}
           </li>
         </ul>
-        {onEdit && onDelete && (
-          <div className="course-popover-tools">
-            <button type="button" className="modal-close" onClick={onEdit} title="Editează" aria-label="Editează">
-              <Icon name="edit" />
-            </button>
-            <button type="button" className="modal-close course-popover-delete" onClick={onDelete} title="Șterge" aria-label="Șterge">
-              <Icon name="trash" />
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
