@@ -12,6 +12,7 @@ const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { parseLayout, buildDesks, describeLayout, summarizeLayout, syncDesks } = require('../layout');
 const { bucharestTime, isDay, isTime } = require('../time');
 const { isValidPassword } = require('../validation');
+const { EVENT_LABELS, describeUserAgent } = require('../logLabels');
 const { NOT_FOUND, INVALID_PASSWORD } = require('../messages');
 
 const router = express.Router();
@@ -203,13 +204,14 @@ router.delete('/attendances/:id', async (req, res) => {
 
 const LOG_PAGE_SIZE = 20;
 const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const plain = value => value.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 
 function nextDay(day) {
   const [year, month, date] = day.split('-').map(Number);
   return new Date(Date.UTC(year, month - 1, date + 1)).toISOString().slice(0, 10);
 }
 
-function logFilter(query) {
+async function logFilter(query) {
   const conditions = [];
   if (mongoose.isValidObjectId(query.course)) conditions.push({ course: query.course });
   if (isDay(query.date)) {
@@ -218,13 +220,22 @@ function logFilter(query) {
   const term = text(query.search);
   if (term) {
     const pattern = new RegExp(escapeRegex(term), 'i');
-    conditions.push({ $or: ['studentName', 'studentId', 'browserId', 'ip', 'tagUid'].map(field => ({ [field]: pattern })) });
+    const matches = label => plain(label).includes(plain(term));
+    const events = Object.keys(EVENT_LABELS).filter(event => matches(EVENT_LABELS[event]));
+    const userAgents = (await ScanLog.distinct('userAgent')).filter(userAgent => matches(describeUserAgent(userAgent)));
+    conditions.push({
+      $or: [
+        ...['studentName', 'studentId', 'browserId', 'ip', 'tagUid'].map(field => ({ [field]: pattern })),
+        { event: { $in: events } },
+        { userAgent: { $in: userAgents } },
+      ],
+    });
   }
   return conditions.length ? { $and: conditions } : {};
 }
 
 router.get('/logs', async (req, res) => {
-  const filter = logFilter(req.query);
+  const filter = await logFilter(req.query);
   const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
   const [total, logs] = await Promise.all([
     ScanLog.countDocuments(filter),
@@ -236,7 +247,12 @@ router.get('/logs', async (req, res) => {
       .populate('course', 'name startsAt')
       .lean(),
   ]);
-  res.json({ logs, total, page, pageSize: LOG_PAGE_SIZE });
+  res.json({
+    logs: logs.map(log => ({ ...log, eventLabel: EVENT_LABELS[log.event] ?? log.event, browser: describeUserAgent(log.userAgent) })),
+    total,
+    page,
+    pageSize: LOG_PAGE_SIZE,
+  });
 });
 
 module.exports = router;

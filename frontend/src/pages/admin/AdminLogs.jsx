@@ -7,21 +7,6 @@ import Icon from '../../components/Icon';
 import Pagination from '../../components/Pagination';
 import CourseSearch from '../../components/CourseSearch';
 import { formatShortDate, formatTime } from '../../format';
-import { describeUserAgent } from '../../userAgent';
-
-const EVENTS = {
-  scan_ok: 'Scanare validă',
-  attendance_ok: 'Prezență înregistrată',
-  link_missing: 'Link fără date',
-  link_invalid: 'Link invalid sau copiat',
-  tag_unknown: 'Etichetă neasociată',
-  no_course: 'Niciun curs în sală',
-  browser_used: 'Browser deja folosit',
-  seat_taken: 'Bancă deja ocupată',
-  token_invalid: 'Sesiune expirată sau transferată',
-  course_ended: 'Curs încheiat',
-  verify_down: 'Serviciu NFC indisponibil',
-};
 
 const EMPTY_FILTERS = { course: '', date: '', search: '' };
 
@@ -102,7 +87,7 @@ export default function AdminLogs() {
                       {formatShortDate(log.at)}
                       <div className="muted">{formatTime(log.at)}</div>
                     </td>
-                    <td>{EVENTS[log.event] ?? log.event}</td>
+                    <td>{log.eventLabel}</td>
                     <td>
                       {log.studentName ?? '—'}
                       {log.studentId && <div className="muted">{log.studentId}</div>}
@@ -111,7 +96,7 @@ export default function AdminLogs() {
                       {log.course ? <Link to={`/courses/${log.course._id}`}>{log.course.name}</Link> : '—'}
                       {log.desk && <div className="muted">{log.desk.label}</div>}
                     </td>
-                    <td title={log.userAgent}>{describeUserAgent(log.userAgent)}</td>
+                    <td title={log.userAgent}>{log.browser}</td>
                     <td className="mono">
                       <span title={log.browserId}>{log.browserId ? log.browserId.slice(0, 8) : '—'}</span>
                       <div className="muted">{log.ip ?? '—'}</div>
