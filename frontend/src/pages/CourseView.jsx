@@ -174,40 +174,42 @@ export default function CourseView() {
         {attendances.length === 0 && <p className="card-body muted">Niciun student nu și-a înregistrat încă prezența.</p>}
         {attendances.length > 0 && rows.length === 0 && <p className="card-body muted">Niciun student găsit.</p>}
         {rows.length > 0 && (
-          <table className="table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nume complet</th>
-                <th>ID student</th>
-                <th>Banca</th>
-                <th>Ora</th>
-                {admin && <th />}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.slice(firstIndex, firstIndex + PAGE_SIZE).map(({ item, number }) => (
-                <tr
-                  key={item._id}
-                  className={selection?.fromList && item.desk === selection.deskId ? 'attendance-row selected' : 'attendance-row'}
-                  onClick={() => showOnMap(item)}
-                  onKeyDown={event => event.key === 'Enter' && showOnMap(item)}
-                  tabIndex={0}
-                >
-                  <td>{number}</td>
-                  <td>{item.studentName}</td>
-                  <td>{item.studentId || '—'}</td>
-                  <td>{deskLabels.get(item.desk) ?? '—'}</td>
-                  <td>{formatTime(item.createdAt)}</td>
-                  {admin && (
-                    <td className="table-actions" onClick={event => event.stopPropagation()}>
-                      <IconButton icon="trash" label="Șterge prezența" onClick={() => removeAttendance(item)} danger />
-                    </td>
-                  )}
+          <div className="table-scroll">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nume complet</th>
+                  <th>ID student</th>
+                  <th>Banca</th>
+                  <th>Ora</th>
+                  {admin && <th />}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {rows.slice(firstIndex, firstIndex + PAGE_SIZE).map(({ item, number }) => (
+                  <tr
+                    key={item._id}
+                    className={selection?.fromList && item.desk === selection.deskId ? 'attendance-row selected' : 'attendance-row'}
+                    onClick={() => showOnMap(item)}
+                    onKeyDown={event => event.key === 'Enter' && showOnMap(item)}
+                    tabIndex={0}
+                  >
+                    <td>{number}</td>
+                    <td>{item.studentName}</td>
+                    <td>{item.studentId || '—'}</td>
+                    <td>{deskLabels.get(item.desk) ?? '—'}</td>
+                    <td>{formatTime(item.createdAt)}</td>
+                    {admin && (
+                      <td className="table-actions" onClick={event => event.stopPropagation()}>
+                        <IconButton icon="trash" label="Șterge prezența" onClick={() => removeAttendance(item)} danger />
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
 

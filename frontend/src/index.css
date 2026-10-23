@@ -691,6 +691,10 @@ h1, h2, h3 {
   overflow: visible;
 }
 
+.table-scroll {
+  overflow-x: auto;
+}
+
 .card-header {
   display: flex;
   flex-wrap: wrap;
@@ -752,7 +756,6 @@ h1, h2, h3 {
 
 .pagination {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   margin-top: -0.5rem;
 }
@@ -777,7 +780,13 @@ h1, h2, h3 {
   border-radius: 0 0.5rem 0.5rem 0;
 }
 
-.page-link:hover:not(:disabled):not(.active) {
+.page-gap {
+  color: var(--muted);
+  text-align: center;
+  cursor: default;
+}
+
+.page-link:hover:not(:disabled):not(.active):not(.page-gap) {
   background: #e9ecef;
 }
 
@@ -1378,6 +1387,11 @@ select.form-control {
 
   .layout > .page {
     width: 100%;
+  }
+
+  .page-link {
+    min-width: 2rem;
+    padding: 0.375rem 0.5rem;
   }
 
   .sidebar {
