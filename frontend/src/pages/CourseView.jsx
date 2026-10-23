@@ -132,7 +132,7 @@ export default function CourseView() {
         {formatDate(course.startsAt)} · {formatInterval(course)} · {course.room.name}
       </p>
 
-      <section className="card" ref={mapRef}>
+      <section className="card map-card" ref={mapRef}>
         <div className="card-body">
           <SeatMap
             desks={desks}
