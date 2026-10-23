@@ -19,13 +19,12 @@ export default function AdminUsers() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
 
   const update = field => event => setForm({ ...form, [field]: event.target.value });
   const words = searchable(search.trim()).split(/\s+/).filter(Boolean);
   const visible = users?.filter(user => {
     const text = searchable(`${user.name} ${user.email}`);
-    return (!roleFilter || user.role === roleFilter) && words.every(word => text.includes(word));
+    return words.every(word => text.includes(word));
   });
 
   function open(user) {
@@ -75,10 +74,6 @@ export default function AdminUsers() {
             <Icon name="search" />
             <input className="form-control" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Caută" aria-label="Caută" />
           </label>
-          <select className="form-control" value={roleFilter} onChange={event => setRoleFilter(event.target.value)} aria-label="Rol">
-            <option value="">Toate rolurile</option>
-            {Object.entries(ROLE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-          </select>
           <button type="button" className="btn btn-primary btn-with-icon" onClick={() => open({})}>
             <Icon name="plus" />
             Adaugă
