@@ -62,7 +62,7 @@ export default function AdminRooms() {
     <Layout>
       <div className="page-header">
         <h2 className="page-title">Săli</h2>
-        <div className="course-filters">
+        <div className="page-filters">
           <SearchSelect
             items={rooms}
             getLabel={room => room.name}

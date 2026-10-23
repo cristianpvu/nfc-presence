@@ -79,7 +79,7 @@ export default function AdminCourses() {
     <Layout>
       <div className="page-header">
         <h2 className="page-title">Cursuri</h2>
-        <div className="course-filters">
+        <div className="page-filters">
           <SearchSelect
             items={professors}
             getLabel={user => user.name}

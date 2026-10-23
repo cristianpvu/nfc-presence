@@ -6,6 +6,7 @@ import FormCard, { Field } from '../../components/FormCard';
 import IconButton from '../../components/IconButton';
 import Icon from '../../components/Icon';
 import { MIN_PASSWORD_LENGTH, PASSWORD_ERROR } from '../../password';
+import { searchable } from '../../names';
 
 const ROLE_LABELS = { professor: 'Profesor', admin: 'Administrator' };
 const EMPTY = { name: '', email: '', role: 'professor', password: '' };
@@ -17,8 +18,15 @@ export default function AdminUsers() {
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
 
   const update = field => event => setForm({ ...form, [field]: event.target.value });
+  const words = searchable(search.trim()).split(/\s+/).filter(Boolean);
+  const visible = users?.filter(user => {
+    const text = searchable(`${user.name} ${user.email}`);
+    return (!roleFilter || user.role === roleFilter) && words.every(word => text.includes(word));
+  });
 
   function open(user) {
     setEditing(user);
@@ -62,10 +70,20 @@ export default function AdminUsers() {
     <Layout>
       <div className="page-header">
         <h2 className="page-title">Utilizatori</h2>
-        <button type="button" className="btn btn-primary btn-with-icon" onClick={() => open({})}>
-          <Icon name="plus" />
-          Adaugă
-        </button>
+        <div className="page-filters">
+          <label className="search">
+            <Icon name="search" />
+            <input className="form-control" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Caută" aria-label="Caută" />
+          </label>
+          <select className="form-control" value={roleFilter} onChange={event => setRoleFilter(event.target.value)} aria-label="Rol">
+            <option value="">Toate rolurile</option>
+            {Object.entries(ROLE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+          <button type="button" className="btn btn-primary btn-with-icon" onClick={() => open({})}>
+            <Icon name="plus" />
+            Adaugă
+          </button>
+        </div>
       </div>
 
       {(error || loadError) && <div className="alert alert-danger page-alert">{error || loadError}</div>}
@@ -103,7 +121,9 @@ export default function AdminUsers() {
         </FormCard>
       )}
 
-      {users && (
+      {visible?.length === 0 && <p className="muted">Niciun utilizator găsit.</p>}
+
+      {visible?.length > 0 && (
         <div className="card">
           <table className="table">
             <thead>
@@ -115,7 +135,7 @@ export default function AdminUsers() {
               </tr>
             </thead>
             <tbody>
-              {users.map(user => (
+              {visible.map(user => (
                 <tr key={user._id}>
                   <td>{user.name}</td>
                   <td>{user.email}</td>

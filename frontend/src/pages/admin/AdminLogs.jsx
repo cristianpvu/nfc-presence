@@ -58,21 +58,22 @@ export default function AdminLogs() {
 
   return (
     <Layout>
-      <h2 className="page-title">Log</h2>
-
-      <div className="log-filters">
-        <CourseSearch courses={courses} onSelect={value => setFilter('course', value)} />
-        <input
-          className="form-control"
-          type="date"
-          value={filters.date}
-          onChange={event => setFilter('date', event.target.value)}
-          aria-label="Data"
-        />
-        <label className="search">
-          <Icon name="search" />
-          <input className="form-control" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Caută" aria-label="Caută" />
-        </label>
+      <div className="page-header">
+        <h2 className="page-title">Log</h2>
+        <div className="page-filters">
+          <CourseSearch courses={courses} onSelect={value => setFilter('course', value)} />
+          <input
+            className="form-control"
+            type="date"
+            value={filters.date}
+            onChange={event => setFilter('date', event.target.value)}
+            aria-label="Data"
+          />
+          <label className="search">
+            <Icon name="search" />
+            <input className="form-control" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Caută" aria-label="Caută" />
+          </label>
+        </div>
       </div>
 
       {error && <div className="alert alert-danger page-alert">{error}</div>}
