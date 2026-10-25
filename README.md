@@ -1,1 +1,1 @@
-NFC presence marking systemm
+NFC presence marking system
