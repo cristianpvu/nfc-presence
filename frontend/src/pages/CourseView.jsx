@@ -7,7 +7,7 @@ import Layout from '../components/Layout';
 import Icon from '../components/Icon';
 import IconButton from '../components/IconButton';
 import Pagination from '../components/Pagination';
-import SeatMap from '../components/SeatMap';
+import SeatMap, { mapSize } from '../components/SeatMap';
 import AddAttendanceModal from '../components/AddAttendanceModal';
 import { formatDate, formatInterval, formatTime } from '../format';
 import { exportAttendance } from '../exportCsv';
@@ -83,6 +83,7 @@ export default function CourseView() {
 
   const { course, desks, attendances } = data;
   const admin = isAdmin();
+  const { width: mapWidth, height: mapHeight } = mapSize(desks);
 
   async function removeAttendance(item) {
     if (!window.confirm(`Ștergi prezența lui ${item.studentName}?`)) return;
@@ -145,7 +146,7 @@ export default function CourseView() {
       </p>
 
       <section className="card map-card" ref={mapRef}>
-        <div className="card-body">
+        <div className="card-body" style={{ '--map-width': mapWidth, '--map-height': mapHeight }}>
           <SeatMap
             desks={desks}
             occupants={occupants}
@@ -156,16 +157,6 @@ export default function CourseView() {
           />
           <div className="map-footer">
             <div className="map-tools">
-              <button
-                type="button"
-                className="map-flip"
-                onClick={() => setFlipped(!flipped)}
-                title={flipped ? 'Catedra jos' : 'Catedra sus'}
-                aria-label={flipped ? 'Catedra jos' : 'Catedra sus'}
-                aria-pressed={flipped}
-              >
-                <Icon name="flip" />
-              </button>
               {document.fullscreenEnabled && (
                 <button
                   type="button"
@@ -178,6 +169,16 @@ export default function CourseView() {
                   <Icon name={fullscreen ? 'shrink' : 'expand'} />
                 </button>
               )}
+              <button
+                type="button"
+                className="map-flip"
+                onClick={() => setFlipped(!flipped)}
+                title={flipped ? 'Catedra jos' : 'Catedra sus'}
+                aria-label={flipped ? 'Catedra jos' : 'Catedra sus'}
+                aria-pressed={flipped}
+              >
+                <Icon name="flip" />
+              </button>
             </div>
             <p className="occupancy muted">{occupants.size} din {desks.length} locuri ocupate</p>
           </div>

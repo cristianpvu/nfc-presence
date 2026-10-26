@@ -837,22 +837,49 @@ h1, h2, h3 {
 .map-card:fullscreen {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   margin: 0;
   border: 0;
   border-radius: 0;
   overflow: auto;
 }
 
+.map-card:fullscreen .card-body {
+  --map-fit: min(100cqw, calc((100vh - 2.5rem) * var(--map-width) / (var(--map-height) + 36)));
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  container-type: inline-size;
+}
+
 .map-card:fullscreen .seat-map-wrap {
-  width: min(100%, calc((100vh - 6rem) * var(--map-ratio)));
+  width: var(--map-fit);
   max-width: none !important;
+  margin: auto;
 }
 
 .map-card:fullscreen .map-footer {
-  width: min(100%, calc((100vh - 6rem) * var(--map-ratio)));
-  margin-right: auto;
-  margin-left: auto;
+  width: var(--map-fit);
+  margin: 0.75em auto 0;
+  font-size: calc(var(--map-fit) * 16 / var(--map-width));
+}
+
+.map-card:fullscreen .map-tools {
+  gap: 0.5em;
+}
+
+.map-card:fullscreen .map-flip {
+  padding: 0.125em;
+  font-size: inherit;
+  border-radius: 0.25em;
+}
+
+.map-card:fullscreen .map-flip .icon {
+  width: 0.875em;
+  height: 0.875em;
+}
+
+.map-card:fullscreen .occupancy {
+  font-size: 0.875em;
 }
 
 .map-flip {

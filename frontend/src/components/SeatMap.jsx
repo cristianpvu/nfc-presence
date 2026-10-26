@@ -15,17 +15,25 @@ const MIN_NAME_SCALE = 0.8;
 const deskX = desk => desk.x ?? desk.col;
 const deskY = desk => desk.y ?? desk.row;
 
+export function mapSize(desks) {
+  const cols = Math.max(1, ...desks.map(deskX));
+  const rows = Math.max(1, ...desks.map(deskY));
+  return {
+    cols,
+    rows,
+    width: PADDING * 2 + cols * DESK_WIDTH + (cols - 1) * GAP,
+    height: PADDING * 2 + BOARD_HEIGHT + GAP * 3 + rows * DESK_HEIGHT + (rows - 1) * GAP,
+  };
+}
+
 export default function SeatMap({ desks, occupants, selectedId, highlighted, onSelect, flipped = false }) {
   const [scale, setScale] = useState(1);
   const popoverRef = useRef(null);
   const wrapRef = useRef(null);
 
-  const cols = Math.max(1, ...desks.map(deskX));
-  const rows = Math.max(1, ...desks.map(deskY));
+  const { cols, rows, width, height } = mapSize(desks);
   const boardTop = flipped ? PADDING : PADDING + rows * DESK_HEIGHT + (rows - 1) * GAP + GAP * 3;
   const desksTop = flipped ? PADDING + BOARD_HEIGHT + GAP * 3 : PADDING;
-  const width = PADDING * 2 + cols * DESK_WIDTH + (cols - 1) * GAP;
-  const height = PADDING * 2 + BOARD_HEIGHT + GAP * 3 + rows * DESK_HEIGHT + (rows - 1) * GAP;
 
   useEffect(() => {
     if (!wrapRef.current) return;
@@ -108,7 +116,7 @@ export default function SeatMap({ desks, occupants, selectedId, highlighted, onS
   }
 
   return (
-    <div ref={wrapRef} className="seat-map-wrap" style={{ maxWidth: width, '--map-ratio': width / height }}>
+    <div ref={wrapRef} className="seat-map-wrap" style={{ maxWidth: width }}>
       <svg className="seat-map" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Plan sală">
         <rect className="board" x={PADDING} y={boardTop} width={width - PADDING * 2} height={BOARD_HEIGHT} rx="4" />
         <text className="board-label" x={width / 2} y={boardTop + BOARD_HEIGHT / 2}>Catedră</text>
