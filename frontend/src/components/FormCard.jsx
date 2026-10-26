@@ -1,9 +1,12 @@
+import { cloneElement, useId } from 'react';
+
 export function Field({ label, wide = false, children }) {
+  const id = useId();
   return (
-    <label className={wide ? 'field field-wide' : 'field'}>
-      <span className="field-label">{label}</span>
-      {children}
-    </label>
+    <div className={wide ? 'field field-wide' : 'field'}>
+      <label className="field-label" htmlFor={id}>{label}</label>
+      {cloneElement(children, { id })}
+    </div>
   );
 }
 
