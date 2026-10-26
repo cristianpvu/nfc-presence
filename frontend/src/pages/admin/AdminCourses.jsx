@@ -6,9 +6,12 @@ import CourseCalendar from '../../components/CourseCalendar';
 import SearchSelect from '../../components/SearchSelect';
 import FormCard, { Field } from '../../components/FormCard';
 import Icon from '../../components/Icon';
+import IconButton from '../../components/IconButton';
 import { dayKey, formatDate, formatTime } from '../../format';
 
 const EMPTY = { name: '', room: '', professor: '', date: '', start: '', end: '' };
+
+const shortDay = date => date.split('-').reverse().join('.');
 
 export default function AdminCourses() {
   const { data: courses, error: loadError, reload } = useApi('/api/admin/courses');
@@ -18,6 +21,7 @@ export default function AdminCourses() {
   const [roomFilter, setRoomFilter] = useState('');
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY);
+  const [dates, setDates] = useState([]);
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -42,8 +46,14 @@ export default function AdminCourses() {
         end: formatTime(course.endsAt),
       }
       : EMPTY);
+    setDates([]);
     setFormError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function addDate() {
+    if (form.date && !dates.includes(form.date)) setDates([...dates, form.date].sort());
+    setForm({ ...form, date: '' });
   }
 
   async function save() {
@@ -52,7 +62,7 @@ export default function AdminCourses() {
     try {
       await api(editing._id ? `/api/admin/courses/${editing._id}` : '/api/admin/courses', {
         method: editing._id ? 'PUT' : 'POST',
-        body: form,
+        body: editing._id ? form : { ...form, dates: [...new Set([...dates, form.date].filter(Boolean))] },
         auth: true,
       });
       setEditing(null);
@@ -128,8 +138,30 @@ export default function AdminCourses() {
               {professors.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
             </select>
           </Field>
-          <Field label="Data">
-            <input className="form-control" type="date" value={form.date} onChange={update('date')} />
+          <Field label={editing._id ? 'Data' : 'Date'}>
+            {editing._id ? (
+              <input className="form-control" type="date" value={form.date} onChange={update('date')} />
+            ) : (
+              <>
+                <div className="date-picker">
+                  <input className="form-control" type="date" value={form.date} onChange={update('date')} />
+                  <IconButton icon="plus" label="Adaugă data" onClick={addDate} />
+                </div>
+                {dates.length > 0 && (
+                  <div className="date-chips">
+                    {dates.map(date => (
+                      <span key={date} className="date-chip">
+                        {shortDay(date)}
+                        <button type="button" onClick={() => setDates(dates.filter(item => item !== date))} aria-label={`Elimină ${shortDay(date)}`}>
+                          <Icon name="close" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <span className="field-hint">Apasă + pentru a adăuga mai multe date.</span>
+              </>
+            )}
           </Field>
           <Field label="Ora de început">
             <input className="form-control" type="time" value={form.start} onChange={update('start')} />

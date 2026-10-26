@@ -157,35 +157,67 @@ router.get('/courses', async (req, res) => {
   res.json(courses);
 });
 
-async function saveCourse(req, res, course) {
-  const { room, professor, date, start, end } = req.body ?? {};
-  const name = text(req.body?.name);
+async function readCourse(body) {
+  const { room, professor, start, end } = body ?? {};
+  const name = text(body?.name);
 
-  if (!name) return fail(res, 400, 'Introdu numele cursului.');
-  if (!mongoose.isValidObjectId(room) || !await Room.exists({ _id: room })) return fail(res, 400, 'Alege o sală.');
+  if (!name) return { error: 'Introdu numele cursului.' };
+  if (!mongoose.isValidObjectId(room) || !await Room.exists({ _id: room })) return { error: 'Alege o sală.' };
   if (!mongoose.isValidObjectId(professor) || !await User.exists({ _id: professor, role: 'professor' })) {
-    return fail(res, 400, 'Alege un profesor.');
+    return { error: 'Alege un profesor.' };
   }
-  if (!isDay(date) || !isTime(start) || !isTime(end)) return fail(res, 400, 'Data sau ora este invalidă.');
-
-  const startsAt = bucharestTime(date, start);
-  const endsAt = bucharestTime(date, end);
-  if (endsAt <= startsAt) return fail(res, 400, 'Ora de sfârșit trebuie să fie după ora de început.');
-
-  const overlap = await Course.exists({ room, _id: { $ne: course._id }, startsAt: { $lt: endsAt }, endsAt: { $gt: startsAt } });
-  if (overlap) return fail(res, 409, 'Sala are deja un curs în acest interval.');
-
-  course.set({ name, room, professor, startsAt, endsAt });
-  await course.save();
-  res.json(course);
+  return { name, room, professor, start, end };
 }
 
-router.post('/courses', (req, res) => saveCourse(req, res, new Course()));
+async function scheduleError({ room, start, end }, date, excludeId) {
+  if (!isDay(date) || !isTime(start) || !isTime(end)) return [400, 'Data sau ora este invalidă.'];
+  const startsAt = bucharestTime(date, start);
+  const endsAt = bucharestTime(date, end);
+  if (endsAt <= startsAt) return [400, 'Ora de sfârșit trebuie să fie după ora de început.'];
+  const overlap = await Course.exists({ room, ...(excludeId && { _id: { $ne: excludeId } }), startsAt: { $lt: endsAt }, endsAt: { $gt: startsAt } });
+  if (overlap) return [409, 'Sala are deja un curs în acest interval.'];
+  return null;
+}
+
+const courseOn = ({ name, room, professor, start, end }, date) => ({
+  name,
+  room,
+  professor,
+  startsAt: bucharestTime(date, start),
+  endsAt: bucharestTime(date, end),
+});
+
+const shortDay = date => date.split('-').reverse().join('.');
+
+router.post('/courses', async (req, res) => {
+  const fields = await readCourse(req.body);
+  if (fields.error) return fail(res, 400, fields.error);
+
+  const dates = [...new Set(Array.isArray(req.body?.dates) ? req.body.dates : [req.body?.date])].sort();
+  if (dates.length === 0) return fail(res, 400, 'Alege cel puțin o dată.');
+  if (dates.length > 100) return fail(res, 400, 'Poți adăuga cel mult 100 de date odată.');
+
+  for (const date of dates) {
+    const error = await scheduleError(fields, date);
+    if (error) return fail(res, error[0], dates.length > 1 && isDay(date) ? `${error[1]} (${shortDay(date)})` : error[1]);
+  }
+
+  const courses = await Course.insertMany(dates.map(date => courseOn(fields, date)));
+  res.json(courses);
+});
 
 router.put('/courses/:id', async (req, res) => {
   const course = await Course.findById(req.params.id);
   if (!course) return fail(res, 404, NOT_FOUND);
-  return saveCourse(req, res, course);
+
+  const fields = await readCourse(req.body);
+  if (fields.error) return fail(res, 400, fields.error);
+  const error = await scheduleError(fields, req.body?.date, course._id);
+  if (error) return fail(res, error[0], error[1]);
+
+  course.set(courseOn(fields, req.body.date));
+  await course.save();
+  res.json(course);
 });
 
 router.delete('/courses/:id', async (req, res) => {
