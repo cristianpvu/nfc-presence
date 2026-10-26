@@ -108,7 +108,7 @@ export default function SeatMap({ desks, occupants, selectedId, highlighted, onS
   }
 
   return (
-    <div ref={wrapRef} className="seat-map-wrap" style={{ maxWidth: width }}>
+    <div ref={wrapRef} className="seat-map-wrap" style={{ maxWidth: width, '--map-ratio': width / height }}>
       <svg className="seat-map" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Plan sală">
         <rect className="board" x={PADDING} y={boardTop} width={width - PADDING * 2} height={BOARD_HEIGHT} rx="4" />
         <text className="board-label" x={width / 2} y={boardTop + BOARD_HEIGHT / 2}>Catedră</text>

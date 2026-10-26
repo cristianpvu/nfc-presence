@@ -24,6 +24,7 @@ export default function CourseView() {
   const [selection, setSelection] = useState(null);
   const [flipped, setFlipped] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   const mapRef = useRef(null);
   const selectFromMap = useCallback(deskId => setSelection(deskId && { deskId, fromList: false }), []);
   const addAttendance = useCallback(entry => {
@@ -33,6 +34,12 @@ export default function CourseView() {
     });
   }, []);
   const closeAddModal = useCallback(() => setAdding(false), []);
+
+  useEffect(() => {
+    const update = () => setFullscreen(Boolean(mapRef.current) && document.fullscreenElement === mapRef.current);
+    document.addEventListener('fullscreenchange', update);
+    return () => document.removeEventListener('fullscreenchange', update);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -93,6 +100,11 @@ export default function CourseView() {
     mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  function toggleFullscreen() {
+    if (fullscreen) document.exitFullscreen();
+    else mapRef.current?.requestFullscreen();
+  }
+
   function updateSearch(event) {
     setSearch(event.target.value);
     setPage(1);
@@ -143,16 +155,30 @@ export default function CourseView() {
             flipped={flipped}
           />
           <div className="map-footer">
-            <button
-              type="button"
-              className="map-flip"
-              onClick={() => setFlipped(!flipped)}
-              title={flipped ? 'Catedra jos' : 'Catedra sus'}
-              aria-label={flipped ? 'Catedra jos' : 'Catedra sus'}
-              aria-pressed={flipped}
-            >
-              <Icon name="flip" />
-            </button>
+            <div className="map-tools">
+              <button
+                type="button"
+                className="map-flip"
+                onClick={() => setFlipped(!flipped)}
+                title={flipped ? 'Catedra jos' : 'Catedra sus'}
+                aria-label={flipped ? 'Catedra jos' : 'Catedra sus'}
+                aria-pressed={flipped}
+              >
+                <Icon name="flip" />
+              </button>
+              {document.fullscreenEnabled && (
+                <button
+                  type="button"
+                  className="map-flip"
+                  onClick={toggleFullscreen}
+                  title={fullscreen ? 'Ieși din ecran complet' : 'Ecran complet'}
+                  aria-label={fullscreen ? 'Ieși din ecran complet' : 'Ecran complet'}
+                  aria-pressed={fullscreen}
+                >
+                  <Icon name={fullscreen ? 'shrink' : 'expand'} />
+                </button>
+              )}
+            </div>
             <p className="occupancy muted">{occupants.size} din {desks.length} locuri ocupate</p>
           </div>
         </div>

@@ -829,6 +829,32 @@ h1, h2, h3 {
   margin: 0;
 }
 
+.map-tools {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.map-card:fullscreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: auto;
+}
+
+.map-card:fullscreen .seat-map-wrap {
+  width: min(100%, calc((100vh - 6rem) * var(--map-ratio)));
+  max-width: none !important;
+}
+
+.map-card:fullscreen .map-footer {
+  width: min(100%, calc((100vh - 6rem) * var(--map-ratio)));
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .map-flip {
   display: flex;
   align-items: center;
