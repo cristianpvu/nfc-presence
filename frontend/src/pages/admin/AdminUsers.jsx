@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { api } from '../../api';
 import useApi from '../../useApi';
 import Layout from '../../components/Layout';
@@ -18,7 +19,8 @@ export default function AdminUsers() {
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [search, setSearch] = useState('');
+  const initialSearch = useLocation().state?.search ?? '';
+  const [search, setSearch] = useState(initialSearch);
 
   const update = field => event => setForm({ ...form, [field]: event.target.value });
   const words = searchable(search.trim()).split(/\s+/).filter(Boolean);

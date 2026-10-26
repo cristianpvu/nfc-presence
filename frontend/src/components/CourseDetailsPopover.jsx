@@ -68,6 +68,12 @@ export default function CourseDetailsPopover({ course, anchor, onClose, onEdit, 
         <ul className="course-details">
           <li><Icon name="courses" />{formatDate(course.startsAt)}</li>
           <li><Icon name="clock" />{formatInterval(course)}</li>
+          {isAdmin() && course.professor?.name && (
+            <li>
+              <Icon name="user" />
+              <Link to="/admin/users" state={{ search: course.professor.name }}>{course.professor.name}</Link>
+            </li>
+          )}
           <li>
             <Icon name="pin" />
             {isAdmin() ? <Link to="/admin/rooms" state={{ room: course.room }}>{course.room.name}</Link> : course.room.name}
