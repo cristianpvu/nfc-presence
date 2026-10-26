@@ -1020,7 +1020,6 @@ h1, h2, h3 {
 .multi-date-toggle .icon {
   width: 18px;
   height: 18px;
-  color: var(--muted);
 }
 
 .multi-date-popover {

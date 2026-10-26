@@ -94,7 +94,7 @@ export default function MultiDatePicker({ value, onChange }) {
         onClick={() => (open ? setDraft(null) : show())}
         aria-expanded={open}
       >
-        <span className={value.length === 0 ? 'muted' : undefined}>{summary(value)}</span>
+        <span>{summary(value)}</span>
         <Icon name="courses" />
       </button>
 
