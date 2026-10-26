@@ -98,19 +98,6 @@ export default function MultiDatePicker({ value, onChange }) {
         <Icon name="courses" />
       </button>
 
-      {value.length > 1 && (
-        <div className="date-chips">
-          {value.map(date => (
-            <span key={date} className="date-chip">
-              {shortDay(date)}
-              <button type="button" onClick={() => onChange(value.filter(item => item !== date))} aria-label={`Elimină ${shortDay(date)}`}>
-                <Icon name="close" />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-
       {open && (
         <div ref={popoverRef} className="multi-date-popover" style={style} role="dialog" aria-label="Alege datele">
           <div className="multi-date-header">

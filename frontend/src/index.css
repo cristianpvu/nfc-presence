@@ -1104,42 +1104,6 @@ h1, h2, h3 {
   font-size: 0.875rem;
 }
 
-.date-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-}
-
-.date-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.125rem 0.25rem 0.125rem 0.625rem;
-  font-size: 0.875rem;
-  color: var(--primary);
-  background: rgba(15, 108, 191, 0.1);
-  border-radius: 999px;
-}
-
-.date-chip button {
-  display: flex;
-  padding: 2px;
-  color: inherit;
-  background: none;
-  border: 0;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.date-chip button:hover {
-  background: rgba(15, 108, 191, 0.15);
-}
-
-.date-chip .icon {
-  width: 14px;
-  height: 14px;
-}
-
 .layout-input {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.875rem;
