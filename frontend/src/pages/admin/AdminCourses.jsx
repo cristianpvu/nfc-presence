@@ -6,12 +6,10 @@ import CourseCalendar from '../../components/CourseCalendar';
 import SearchSelect from '../../components/SearchSelect';
 import FormCard, { Field } from '../../components/FormCard';
 import Icon from '../../components/Icon';
-import IconButton from '../../components/IconButton';
+import MultiDatePicker from '../../components/MultiDatePicker';
 import { dayKey, formatDate, formatTime } from '../../format';
 
 const EMPTY = { name: '', room: '', professor: '', date: '', start: '', end: '' };
-
-const shortDay = date => date.split('-').reverse().join('.');
 
 export default function AdminCourses() {
   const { data: courses, error: loadError, reload } = useApi('/api/admin/courses');
@@ -51,18 +49,13 @@ export default function AdminCourses() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function addDate() {
-    if (form.date && !dates.includes(form.date)) setDates([...dates, form.date].sort());
-    setForm({ ...form, date: '' });
-  }
-
   async function save() {
     setSaving(true);
     setFormError('');
     try {
       await api(editing._id ? `/api/admin/courses/${editing._id}` : '/api/admin/courses', {
         method: editing._id ? 'PUT' : 'POST',
-        body: editing._id ? form : { ...form, dates: [...new Set([...dates, form.date].filter(Boolean))] },
+        body: editing._id ? form : { ...form, dates },
         auth: true,
       });
       setEditing(null);
@@ -138,31 +131,16 @@ export default function AdminCourses() {
               {professors.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
             </select>
           </Field>
-          <Field label={editing._id ? 'Data' : 'Date'}>
-            {editing._id ? (
+          {editing._id ? (
+            <Field label="Data">
               <input className="form-control" type="date" value={form.date} onChange={update('date')} />
-            ) : (
-              <>
-                <div className="date-picker">
-                  <input className="form-control" type="date" value={form.date} onChange={update('date')} />
-                  <IconButton icon="plus" label="Adaugă data" onClick={addDate} />
-                </div>
-                {dates.length > 0 && (
-                  <div className="date-chips">
-                    {dates.map(date => (
-                      <span key={date} className="date-chip">
-                        {shortDay(date)}
-                        <button type="button" onClick={() => setDates(dates.filter(item => item !== date))} aria-label={`Elimină ${shortDay(date)}`}>
-                          <Icon name="close" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <span className="field-hint">Apasă + pentru a adăuga mai multe date.</span>
-              </>
-            )}
-          </Field>
+            </Field>
+          ) : (
+            <div className="field">
+              <span className="field-label">Date</span>
+              <MultiDatePicker value={dates} onChange={setDates} />
+            </div>
+          )}
           <Field label="Ora de început">
             <input className="form-control" type="time" value={form.start} onChange={update('start')} />
           </Field>

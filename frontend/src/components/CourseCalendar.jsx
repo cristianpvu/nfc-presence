@@ -10,7 +10,7 @@ function currentMonth() {
   return { year, month: month - 1 };
 }
 
-function buildWeeks(year, month) {
+export function buildWeeks(year, month) {
   const offset = (new Date(Date.UTC(year, month, 1)).getUTCDay() + 6) % 7;
   const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
   const weekCount = Math.ceil((offset + daysInMonth) / 7);
